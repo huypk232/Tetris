@@ -36,12 +36,18 @@ public class Spawner : MonoBehaviour
     public void Spawn()
     {
         // load next block
+        Vector3 oldPosition = nextBlocks[0].transform.position;
         nextBlocks[0].transform.position = transform.position;
         if( nextBlocks[0].TryGetComponent<Block>(out Block nextBlock))
         {
-            nextBlock.enabled = true;
+            if(nextBlock.ValidMovement()){
+                nextBlock.enabled = true;
+            } else {
+                nextBlocks[0].transform.position = oldPosition;
+                GameManager.instance.GameOver();
+                return;
+            }
         }
-        // remove old block
         nextBlocks.RemoveAt(0);
         
         UpdateNextBlocks();

@@ -14,20 +14,27 @@ public class Block : MonoBehaviour
     private float _deltaFallTime;
 
     private static Transform[,] board = new Transform[rightLimit, topLimit];
+    private static GameObject heldBlock;
+    private static bool holdInTurn = false;
+
+    private Transform holdArea;
+    private Transform spawnPoint;
 
     [Tooltip("Offset center to modify when rendering")]
     public Vector3 center;
 
     void Start()
     {
+        holdArea = GameObject.Find("/Level/Hold Area/Hold").transform;
+        spawnPoint = GameObject.Find("/Level/Spawner").transform;
         _deltaFallTime = _fallTime;
     }
 
     void Update()
     {
         Move();
-        Fall();
         Hold();
+        Fall();
     }
 
     // render center to destination des
@@ -76,6 +83,7 @@ public class Block : MonoBehaviour
             }
             enabled = false;
             FindObjectOfType<Spawner>().Spawn();
+            holdInTurn = false; // refactor
         }
         
         if(_deltaFallTime > 0.0f)
@@ -99,7 +107,7 @@ public class Block : MonoBehaviour
                 }
                 enabled = false;
                 FindObjectOfType<Spawner>().Spawn();
-                
+                holdInTurn = false; // refactor
             }
             _deltaFallTime = _fallTime;
         }   
@@ -107,9 +115,29 @@ public class Block : MonoBehaviour
 
     private void Hold()
     {
-        if(Input.GetKey(KeyCode.C))
+        if(Input.GetKeyDown(KeyCode.C))
         {
-            FindObjectOfType<Spawner>().Hold(gameObject);
+            Debug.Log(holdInTurn);
+            if(!holdInTurn)
+            {
+                enabled = false;
+                transform.rotation = Quaternion.identity;
+                RenderCenter(holdArea.position);
+
+                if(heldBlock == null)
+                {
+                    heldBlock = transform.gameObject;
+                    FindObjectOfType<Spawner>().Spawn();
+                } else {
+                    heldBlock.TryGetComponent<Block>(out Block tempBlock);
+                    {
+                        tempBlock.enabled = true;
+                    }
+                    heldBlock.transform.position = spawnPoint.position;
+                    heldBlock = transform.gameObject;
+                }
+                holdInTurn = true;
+            } else return;
         }
     }
 
@@ -198,7 +226,7 @@ public class Block : MonoBehaviour
         }
     }
 
-    private bool ValidMovement()
+    public bool ValidMovement()
     {
         foreach (Transform child in transform)
         {

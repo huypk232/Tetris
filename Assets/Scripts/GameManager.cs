@@ -27,6 +27,7 @@ public class GameManager : MonoBehaviour
     public void StartGame()
     {
         level.SetActive(true);
+        ingameCanvas.SetActive(false);
     }
 
     public void GameOver()
@@ -38,7 +39,6 @@ public class GameManager : MonoBehaviour
             spawner.enabled = false;
         }
         gameOverCanvas.SetActive(true);
-        ingameCanvas.SetActive(false);
 
     }
 
