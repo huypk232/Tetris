@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+
+
 public class Block : MonoBehaviour
 {
     public Vector3 rotationPoint;
@@ -32,9 +34,13 @@ public class Block : MonoBehaviour
 
     void Update()
     {
-        Move();
-        Hold();
-        Fall();
+        if(GameManager.instance.currentState == GameState.Move)
+        {
+            Move();
+            HoldAndFall();
+            // Hold();
+        }
+        
     }
 
     // render center to destination des
@@ -65,15 +71,11 @@ public class Block : MonoBehaviour
         }  
     }
 
-    private void Fall()
+    private void HoldAndFall()
     {
         if(Input.GetKeyDown(KeyCode.Space))
         {
-            while(ValidMovement())
-            {
-                transform.position += Vector3.down;
-            }
-            transform.position += Vector3.up;
+            StartCoroutine(SmashCoroutine());
             AddToBoard();
             if(IsFullCols())
             {
@@ -84,61 +86,79 @@ public class Block : MonoBehaviour
             enabled = false;
             FindObjectOfType<Spawner>().Spawn();
             holdInTurn = false; // refactor
-        }
-        
-        if(_deltaFallTime > 0.0f)
-        {
-            if(Input.GetKey(KeyCode.DownArrow))
-            {
-                _deltaFallTime -= 10 * Time.deltaTime;
-            } else {
-                _deltaFallTime -= Time.deltaTime;
-            }
-        } else {
-            transform.position += Vector3.down;
-            if(!ValidMovement()) 
-            {
-                transform.position += Vector3.up;
-                AddToBoard();
-                if(IsFullCols()){
-                    enabled = false;
-                    GameManager.instance.GameOver();
-                    return;
-                }
-                enabled = false;
-                FindObjectOfType<Spawner>().Spawn();
-                holdInTurn = false; // refactor
-            }
-            _deltaFallTime = _fallTime;
-        }   
-    }
-
-    private void Hold()
-    {
-        if(Input.GetKeyDown(KeyCode.C))
-        {
-            Debug.Log(holdInTurn);
+            GameManager.instance.currentState = GameState.Move;
+        } else if(Input.GetKeyDown(KeyCode.C)) {
             if(!holdInTurn)
             {
-                enabled = false;
-                transform.rotation = Quaternion.identity;
-                RenderCenter(holdArea.position);
-
-                if(heldBlock == null)
-                {
-                    heldBlock = transform.gameObject;
-                    FindObjectOfType<Spawner>().Spawn();
-                } else {
-                    heldBlock.TryGetComponent<Block>(out Block tempBlock);
-                    {
-                        tempBlock.enabled = true;
-                    }
-                    heldBlock.transform.position = spawnPoint.position;
-                    heldBlock = transform.gameObject;
-                }
-                holdInTurn = true;
+                StartCoroutine(HoldCoroutine());
             } else return;
+        } else {
+            
+            if(_deltaFallTime > 0.0f)
+            {
+                if(Input.GetKey(KeyCode.DownArrow))
+                {
+                    _deltaFallTime -= 10 * Time.deltaTime;
+                } else {
+                    _deltaFallTime -= Time.deltaTime;
+                }
+            } else {
+                transform.position += Vector3.down;
+                if(!ValidMovement()) 
+                {
+                    transform.position += Vector3.up;
+                    AddToBoard();
+                    if(IsFullCols()){
+                        enabled = false;
+                        GameManager.instance.GameOver();
+                        return;
+                    }
+                    enabled = false;
+                    FindObjectOfType<Spawner>().Spawn();
+                    holdInTurn = false; // refactor
+                }
+                _deltaFallTime = _fallTime;
+            }   
+        } 
+        
+    }
+
+    IEnumerator SmashCoroutine()
+    {
+        GameManager.instance.currentState = GameState.Wait;
+        Debug.Log(GameManager.instance.currentState);
+        while(ValidMovement())
+        {
+            transform.position += Vector3.down;
         }
+        transform.position += Vector3.up;
+        yield return new WaitForSeconds(0.1f);
+        GameManager.instance.currentState = GameState.Move;
+    }
+
+    // to do do not need this, remove
+    IEnumerator HoldCoroutine()
+    {
+        GameManager.instance.currentState = GameState.Wait;
+        enabled = false;
+        transform.rotation = Quaternion.identity;
+        RenderCenter(holdArea.position);
+
+        if(heldBlock == null)
+        {
+            heldBlock = transform.gameObject;
+            FindObjectOfType<Spawner>().Spawn();
+        } else {
+            heldBlock.TryGetComponent<Block>(out Block tempBlock);
+            {
+                tempBlock.enabled = true;
+            }
+            heldBlock.transform.position = spawnPoint.position;
+            heldBlock = transform.gameObject;
+        }
+        holdInTurn = true;
+        yield return null;
+        GameManager.instance.currentState = GameState.Move;
     }
 
     private void AddToBoard()

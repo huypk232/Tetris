@@ -5,6 +5,11 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using TMPro;
 
+public enum GameState
+{
+    Move, Wait
+}
+
 public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
@@ -12,6 +17,7 @@ public class GameManager : MonoBehaviour
     public GameObject level;
     public GameObject gameOverCanvas;
     public GameObject ingameCanvas;
+    public GameState currentState = GameState.Move;
 
     void Awake()
     {
