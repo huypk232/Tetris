@@ -49,7 +49,6 @@ public class Spawner : MonoBehaviour
             }
         }
         nextBlocks.RemoveAt(0);
-        
         UpdateNextBlocks();
         holdInTurn = false;
     }

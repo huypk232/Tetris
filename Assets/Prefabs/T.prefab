@@ -24,8 +24,9 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7730502143098947005}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 5, y: 20, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -34,7 +35,6 @@ Transform:
   - {fileID: 5060935851293931440}
   - {fileID: 8457620223344723219}
   m_Father: {fileID: 0}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &-2607739723282424878
 MonoBehaviour:
@@ -48,7 +48,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 282f2f87d9c72b7478a43a5a987a7325, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rotationPoint: {x: 0.5, y: -0.5, z: 0}
+  type: 5
+  rotationPoint: {fileID: 5060935851293931440}
   center: {x: 0.5, y: 0, z: 0}
 --- !u!1001 &4922832096844875061
 PrefabInstance:
@@ -210,7 +211,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8018854510930056836, guid: 9b8272785073faf4ba9f56eb849698d4, type: 3}
       propertyPath: m_Name
-      value: B
+      value: Center
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

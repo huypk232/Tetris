@@ -2,11 +2,20 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-
+public enum BlockType {
+    I = 0,
+    J = 1,
+    L = 2,
+    O = 3,
+    S = 4,
+    T = 5,
+    Z = 6,
+}
 
 public class Block : MonoBehaviour
 {
-    public Vector3 rotationPoint;
+    [SerializeField] private BlockType type;
+    [SerializeField] private Transform rotationPoint;
     private static int leftLimit = 0;
     private static int rightLimit = 10;
     private static int botLimit = 0;
@@ -15,12 +24,15 @@ public class Block : MonoBehaviour
     private float _fallTime = 1f;
     private float _deltaFallTime;
 
-    private static Transform[,] board = new Transform[rightLimit, topLimit];
+    [Header("Share object")]
+    public static Transform[,] board = new Transform[rightLimit, topLimit]; // share among block instances
     private static GameObject heldBlock;
     private static bool holdInTurn = false;
 
     private Transform holdArea;
     private Transform spawnPoint;
+
+
 
     [Tooltip("Offset center to modify when rendering")]
     public Vector3 center;
@@ -64,9 +76,9 @@ public class Block : MonoBehaviour
 
         if(Input.GetKeyDown(KeyCode.UpArrow))
         {
-            transform.RotateAround(transform.TransformPoint(rotationPoint), new Vector3(0, 0, 1), -90);
+            transform.RotateAround(rotationPoint.position, new Vector3(0, 0, 1), -90);
             if(!ValidMovement()) 
-                transform.RotateAround(transform.TransformPoint(rotationPoint), new Vector3(0, 0, 1), 90);
+                transform.RotateAround(rotationPoint.position, new Vector3(0, 0, 1), 90);
 
         }  
     }
