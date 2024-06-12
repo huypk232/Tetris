@@ -2,8 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-
-
 public class Block : MonoBehaviour
 {
     public Vector3 rotationPoint;
@@ -38,7 +36,6 @@ public class Block : MonoBehaviour
         {
             Move();
             HoldAndFall();
-            // Hold();
         }
         
     }
@@ -126,7 +123,6 @@ public class Block : MonoBehaviour
     IEnumerator SmashCoroutine()
     {
         GameManager.instance.currentState = GameState.Wait;
-        Debug.Log(GameManager.instance.currentState);
         while(ValidMovement())
         {
             transform.position += Vector3.down;
@@ -136,7 +132,7 @@ public class Block : MonoBehaviour
         GameManager.instance.currentState = GameState.Move;
     }
 
-    // to do do not need this, remove
+    // todo do not need this, remove
     IEnumerator HoldCoroutine()
     {
         GameManager.instance.currentState = GameState.Wait;
