@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -27,15 +28,42 @@ public class Block : MonoBehaviour
 
     // [FormerlySerializedAs("_board")]
     [Header("Share object")]
-    private static Transform[][] board = new Transform[RightLimit - LeftLimit][]; // share among block instances
+    // private static Transform[][] board = new Transform[23][]
+    // {
+    //     new Transform[RightLimit - LeftLimit],
+    //     new Transform[RightLimit - LeftLimit],
+    //     new Transform[RightLimit - LeftLimit],
+    //     new Transform[RightLimit - LeftLimit],
+    //     new Transform[RightLimit - LeftLimit],
+    //     new Transform[RightLimit - LeftLimit],
+    //     new Transform[RightLimit - LeftLimit],
+    //     new Transform[RightLimit - LeftLimit],
+    //     new Transform[RightLimit - LeftLimit],
+    //     new Transform[RightLimit - LeftLimit],
+    //     new Transform[RightLimit - LeftLimit],
+    //     new Transform[RightLimit - LeftLimit],
+    //     new Transform[RightLimit - LeftLimit],
+    //     new Transform[RightLimit - LeftLimit],
+    //     new Transform[RightLimit - LeftLimit],
+    //     new Transform[RightLimit - LeftLimit],
+    //     new Transform[RightLimit - LeftLimit],
+    //     new Transform[RightLimit - LeftLimit],
+    //     new Transform[RightLimit - LeftLimit],
+    //     new Transform[RightLimit - LeftLimit],
+    //     new Transform[RightLimit - LeftLimit],
+    //     new Transform[RightLimit - LeftLimit],
+    //     new Transform[RightLimit - LeftLimit],
+    // }; // share among block instances
+    private Transform[][] tiles;
+
     // public GameObject boardGo; // share among block instances
     private static GameObject _heldBlock;
     private static bool _holdInTurn;
-    // private Board board;
+    private Board board;
 
-    [SerializeField] private Transform holdArea;
-    [SerializeField] private Transform spawnPoint;
-    [FormerlySerializedAs("_spawner")] [SerializeField] private Spawner spawner;
+    private Transform _holdArea;
+    private Transform _spawnPoint;
+    private Spawner _spawner;
     
     [Tooltip("Offset center to modify when rendering")]
     [SerializeField] private Vector3 centerOffset;
@@ -47,19 +75,24 @@ public class Block : MonoBehaviour
 
     private void Start()
     {
-        for (int column = 0; column < TopLimit - BottomLimit; column++)
-        {
-            board[column] = new Transform[TopLimit - BottomLimit];
-        }
-        holdArea = GameObject.Find("/Level/Hold Area/Hold").transform;
-        spawnPoint = GameObject.Find("/Level/Spawner").transform;
-        spawner = FindObjectOfType<Spawner>();
+        board = FindObjectOfType<Board>();
+        tiles = board._tiles;
+        Debug.Log("tile: " + tiles.Length);
+        // for (int column = 0; column < RightLimit - LeftLimit; column++)
+        // {
+        //     board[column] = new Transform[TopLimit - BottomLimit];
+        // }
+        _holdArea = GameObject.Find("/Level/Hold Area/Hold").transform;
+        _spawnPoint = GameObject.Find("/Level/Spawner").transform;
+        _spawner = FindObjectOfType<Spawner>();
         _deltaFallTime = FallTime;
         // board = boardGo.GetComponent<Board>();
     }
 
     private void Update()
     {
+        tiles = board._tiles;
+
         if (GameManager.instance.currentState == GameState.Move)
         {
             Move();
@@ -101,15 +134,16 @@ public class Block : MonoBehaviour
         if(Input.GetKeyDown(KeyCode.Space))
         {
             StartCoroutine(SmashCoroutine());
-            AddToBoard();
+            board.AddToBoard(gameObject);
             if(IsFullCols())
             {
                 enabled = false;
                 GameManager.instance.GameOver();
                 return;
             }
+            Debug.Log("current board: " + type + " - " + tiles[0][0]);
             enabled = false;
-            spawner.Spawn();
+            _spawner.Spawn();
             _holdInTurn = false; // refactor
             GameManager.instance.currentState = GameState.Move;
         } else if(Input.GetKeyDown(KeyCode.C)) {
@@ -132,14 +166,14 @@ public class Block : MonoBehaviour
                 if(!ValidMovement()) 
                 {
                     transform.position += Vector3.up;
-                    AddToBoard();
+                    board.AddToBoard(gameObject);
                     if(IsFullCols()){
                         enabled = false;
                         GameManager.instance.GameOver();
                         return;
                     }
                     enabled = false;
-                    spawner.Spawn();
+                    _spawner.Spawn();
                     _holdInTurn = false; // refactor
                 }
                 _deltaFallTime = FallTime;
@@ -166,18 +200,18 @@ public class Block : MonoBehaviour
         GameManager.instance.currentState = GameState.Wait;
         enabled = false;
         transform.rotation = Quaternion.identity;
-        RenderCenter(holdArea.position);
+        RenderCenter(_holdArea.position);
 
         if(!_heldBlock)
         {
             _heldBlock = transform.gameObject;
-            spawner.Spawn();
+            _spawner.Spawn();
         } else {
             _heldBlock.TryGetComponent(out Block tempBlock);
             {
                 tempBlock.enabled = true;
             }
-            _heldBlock.transform.position = spawnPoint.position;
+            _heldBlock.transform.position = _spawnPoint.position;
             _heldBlock = transform.gameObject;
         }
         _holdInTurn = true;
@@ -185,29 +219,30 @@ public class Block : MonoBehaviour
         GameManager.instance.currentState = GameState.Move;
     }
 
-    private void AddToBoard()
-    {
-        var minY = TopLimit;
-        var maxY = BottomLimit;
-        foreach (Transform child in transform)
-        {
-            if(child.name == "Center") continue;
-            var xIndex = (int)child.position.x;
-            var yIndex = (int)child.position.y;
-            board[xIndex][yIndex] = child;
-            if (minY > yIndex) minY = yIndex;
-            else if (maxY < yIndex) maxY = yIndex;
-        }
-        // check lines is full ?, todo refactor
-        for(var line = maxY; line >= minY; line--)
-        {
-            if(IsFullLine(line))
-            {
-                DeleteFullLine(line);
-                RowDown(line);
-            }
-        }
-    }
+    // private void AddToBoard()
+    // {
+    //     var minY = TopLimit;
+    //     var maxY = BottomLimit;
+    //     
+    //     foreach (Transform child in transform)
+    //     {
+    //         // if(child.name == "Center") continue;
+    //         var xIndex = (int)child.position.x;
+    //         var yIndex = (int)child.position.y;
+    //         board[xIndex][yIndex] = child;
+    //         if (minY > yIndex) minY = yIndex;
+    //         else if (maxY < yIndex) maxY = yIndex;
+    //     }
+    //     // check lines is full ?, todo refactor
+    //     for(var line = maxY; line >= minY; line--)
+    //     {
+    //         if(IsFullLine(line))
+    //         {
+    //             DeleteFullLine(line);
+    //             RowDown(line);
+    //         }
+    //     }
+    // }
 
     private bool IsFullCols()
     {
@@ -237,7 +272,7 @@ public class Block : MonoBehaviour
     {
         for (int x = 0; x < RightLimit; x++)
         {
-            if (!board[x][y])
+            if (!tiles[x][y])
                 return false;
         }
         return true;
@@ -247,8 +282,8 @@ public class Block : MonoBehaviour
     {
         for (int x = 0; x < RightLimit; x++)
         {
-            Destroy(board[x][y].gameObject);
-            board[x][y] = null;
+            Destroy(tiles[x][y].gameObject);
+            tiles[x][y] = null;
         }
     }
 
@@ -258,12 +293,11 @@ public class Block : MonoBehaviour
         {
             for (int x = 0; x < RightLimit; x++)
             {
-                Debug.Log(board[x][y]);
-                if(board[x][y])
+                if(tiles[x][y])
                 {
-                    board[x][y - 1] = board[x][y];
-                    board[x][y] = null;
-                    board[x][y - 1].position += Vector3.down;
+                    tiles[x][y - 1] = tiles[x][y];
+                    tiles[x][y] = null;
+                    tiles[x][y - 1].position += Vector3.down;
                 }
             }
         }
@@ -280,7 +314,7 @@ public class Block : MonoBehaviour
 
             int xIndex = (int)child.position.x;
             int yIndex = (int)child.position.y;
-            if(board[xIndex][yIndex]) 
+            if(tiles[xIndex][yIndex]) 
                 return false;
         }
         return true;
