@@ -11,19 +11,19 @@ public class Spawner : MonoBehaviour
     private List<GameObject> nextBlocks = new List<GameObject>();
     private GameObject holdBlock;
 
-    public bool holdInTurn = false;
-
     void Start()
     {
         int firstRandomIndex = Random.Range(0, blocks.Length);
-        GameObject firstBlock = Instantiate(blocks[firstRandomIndex], transform.position, Quaternion.identity);
+        
+        // First block
+        Instantiate(blocks[firstRandomIndex], transform.position, Quaternion.identity);
 
         // Spawn block in next area
         while(nextBlocks.Count < 5)
         {
             int randomIndex = Random.Range(0, blocks.Length);
             GameObject newBlock = Instantiate(blocks[randomIndex], nextAreas[nextBlocks.Count].position, Quaternion.identity);
-            if(newBlock.TryGetComponent<Block>(out Block block))
+            if(newBlock.TryGetComponent(out Block block))
             {
                 block.RenderCenter(nextAreas[nextBlocks.Count].position);
                 block.enabled = false;
@@ -48,39 +48,6 @@ public class Spawner : MonoBehaviour
         }
         nextBlocks.RemoveAt(0);
         UpdateNextBlocks();
-        holdInTurn = false;
-    }
-
-    private void LoadNextBlock()
-    {
-        
-    }
-
-    public void Hold(GameObject blockGO)
-    {
-        if(!holdInTurn)
-        {
-            blockGO.transform.rotation = Quaternion.identity;
-            if(blockGO.TryGetComponent<Block>(out Block block))
-            {
-                block.RenderCenter(holdArea.position);
-                block.enabled = false;
-            }
-
-            if(holdBlock == null)
-            {
-                holdBlock = blockGO;
-                Spawn();
-            } else {
-                holdBlock.TryGetComponent<Block>(out Block tempBlock);
-                {
-                    tempBlock.enabled = true;
-                }
-                holdBlock.transform.position = transform.position;
-                holdBlock = blockGO;
-            }
-            holdInTurn = true;
-        } else return;
     }
 
     private void UpdateNextBlocks()

@@ -1,6 +1,8 @@
+using System;
 using System.Collections;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public enum BlockType {
     I = 0,
@@ -23,24 +25,37 @@ public class Block : MonoBehaviour
     private const float FallTime = 1f;
     private float _deltaFallTime;
 
+    // [FormerlySerializedAs("_board")]
     [Header("Share object")]
-    private static Transform[,] _board = new Transform[RightLimit,TopLimit]; // share among block instances
+    private static Transform[][] board = new Transform[RightLimit - LeftLimit][]; // share among block instances
+    // public GameObject boardGo; // share among block instances
     private static GameObject _heldBlock;
     private static bool _holdInTurn;
+    // private Board board;
 
     [SerializeField] private Transform holdArea;
     [SerializeField] private Transform spawnPoint;
-    [SerializeField] private Spawner spawner;
+    [FormerlySerializedAs("_spawner")] [SerializeField] private Spawner spawner;
     
     [Tooltip("Offset center to modify when rendering")]
     [SerializeField] private Vector3 centerOffset;
 
+    private void Awake()
+    {
+        
+    }
+
     private void Start()
     {
+        for (int column = 0; column < TopLimit - BottomLimit; column++)
+        {
+            board[column] = new Transform[TopLimit - BottomLimit];
+        }
         holdArea = GameObject.Find("/Level/Hold Area/Hold").transform;
         spawnPoint = GameObject.Find("/Level/Spawner").transform;
         spawner = FindObjectOfType<Spawner>();
         _deltaFallTime = FallTime;
+        // board = boardGo.GetComponent<Board>();
     }
 
     private void Update()
@@ -179,7 +194,7 @@ public class Block : MonoBehaviour
             if(child.name == "Center") continue;
             var xIndex = (int)child.position.x;
             var yIndex = (int)child.position.y;
-            _board[xIndex, yIndex] = child;
+            board[xIndex][yIndex] = child;
             if (minY > yIndex) minY = yIndex;
             else if (maxY < yIndex) maxY = yIndex;
         }
@@ -218,36 +233,37 @@ public class Block : MonoBehaviour
         }
     }
 
-    private static bool IsFullLine(int y)
+    private bool IsFullLine(int y)
     {
         for (int x = 0; x < RightLimit; x++)
         {
-            if (!_board[x, y])
+            if (!board[x][y])
                 return false;
         }
         return true;
     }
 
-    private static void DeleteFullLine(int y)
+    private void DeleteFullLine(int y)
     {
         for (int x = 0; x < RightLimit; x++)
         {
-            Destroy(_board[x, y].gameObject);
-            _board[x, y] = null;
+            Destroy(board[x][y].gameObject);
+            board[x][y] = null;
         }
     }
 
-    private static void RowDown(int i)
+    private void RowDown(int i)
     {
         for (int y = i; y < TopLimit; y++)
         {
             for (int x = 0; x < RightLimit; x++)
             {
-                if(_board[x, y])
+                Debug.Log(board[x][y]);
+                if(board[x][y])
                 {
-                    _board[x, y - 1] = _board[x, y];
-                    _board[x, y] = null;
-                    _board[x, y - 1].position += Vector3.down;
+                    board[x][y - 1] = board[x][y];
+                    board[x][y] = null;
+                    board[x][y - 1].position += Vector3.down;
                 }
             }
         }
@@ -264,7 +280,7 @@ public class Block : MonoBehaviour
 
             int xIndex = (int)child.position.x;
             int yIndex = (int)child.position.y;
-            if(_board[xIndex, yIndex]) 
+            if(board[xIndex][yIndex]) 
                 return false;
         }
         return true;
