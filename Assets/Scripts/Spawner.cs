@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -35,8 +34,7 @@ public class Spawner : MonoBehaviour
 
     public void Spawn()
     {
-        // load next block
-        Vector3 oldPosition = nextBlocks[0].transform.position;
+        var oldPosition = nextBlocks[0].transform.position;
         nextBlocks[0].transform.position = transform.position;
         if( nextBlocks[0].TryGetComponent<Block>(out Block nextBlock))
         {

@@ -1,5 +1,5 @@
 using System.Collections;
-using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public enum BlockType {
@@ -16,50 +16,48 @@ public class Block : MonoBehaviour
 {
     [SerializeField] private BlockType type;
     [SerializeField] private Transform rotationPoint;
-    private static int leftLimit = 0;
-    private static int rightLimit = 10;
-    private static int botLimit = 0;
-    private static int topLimit = 23;
-
-    private float _fallTime = 1f;
+    private const int LeftLimit = 0;
+    private const int RightLimit = 10;
+    private const int BottomLimit = 0;
+    private const int TopLimit = 23;
+    private const float FallTime = 1f;
     private float _deltaFallTime;
 
     [Header("Share object")]
-    public static Transform[,] board = new Transform[rightLimit, topLimit]; // share among block instances
-    private static GameObject heldBlock;
-    private static bool holdInTurn = false;
+    private static Transform[,] _board = new Transform[RightLimit,TopLimit]; // share among block instances
+    private static GameObject _heldBlock;
+    private static bool _holdInTurn;
 
-    private Transform holdArea;
-    private Transform spawnPoint;
-
-
-
+    [SerializeField] private Transform holdArea;
+    [SerializeField] private Transform spawnPoint;
+    [SerializeField] private Spawner spawner;
+    
     [Tooltip("Offset center to modify when rendering")]
-    public Vector3 center;
+    [SerializeField] private Vector3 centerOffset;
 
-    void Start()
+    private void Start()
     {
         holdArea = GameObject.Find("/Level/Hold Area/Hold").transform;
         spawnPoint = GameObject.Find("/Level/Spawner").transform;
-        _deltaFallTime = _fallTime;
+        spawner = FindObjectOfType<Spawner>();
+        _deltaFallTime = FallTime;
     }
 
-    void Update()
+    private void Update()
     {
-        if(GameManager.instance.currentState == GameState.Move)
+        if (GameManager.instance.currentState == GameState.Move)
         {
             Move();
             HoldAndFall();
             // Hold();
         }
-        
     }
 
     // render center to destination des
     public void RenderCenter(Vector3 des)
     {
         transform.position = des;
-        transform.position += des - transform.TransformPoint(center);
+        transform.position += des - transform.TransformPoint(centerOffset);
     }
 
     private void Move()
@@ -96,14 +94,14 @@ public class Block : MonoBehaviour
                 return;
             }
             enabled = false;
-            FindObjectOfType<Spawner>().Spawn();
-            holdInTurn = false; // refactor
+            spawner.Spawn();
+            _holdInTurn = false; // refactor
             GameManager.instance.currentState = GameState.Move;
         } else if(Input.GetKeyDown(KeyCode.C)) {
-            if(!holdInTurn)
+            if(!_holdInTurn)
             {
                 StartCoroutine(HoldCoroutine());
-            } else return;
+            }
         } else {
             
             if(_deltaFallTime > 0.0f)
@@ -126,19 +124,18 @@ public class Block : MonoBehaviour
                         return;
                     }
                     enabled = false;
-                    FindObjectOfType<Spawner>().Spawn();
-                    holdInTurn = false; // refactor
+                    spawner.Spawn();
+                    _holdInTurn = false; // refactor
                 }
-                _deltaFallTime = _fallTime;
+                _deltaFallTime = FallTime;
             }   
         } 
         
     }
 
-    IEnumerator SmashCoroutine()
+    private IEnumerator SmashCoroutine()
     {
         GameManager.instance.currentState = GameState.Wait;
-        Debug.Log(GameManager.instance.currentState);
         while(ValidMovement())
         {
             transform.position += Vector3.down;
@@ -148,48 +145,46 @@ public class Block : MonoBehaviour
         GameManager.instance.currentState = GameState.Move;
     }
 
-    // to do do not need this, remove
-    IEnumerator HoldCoroutine()
+    // todo do not need this, remove
+    private IEnumerator HoldCoroutine()
     {
         GameManager.instance.currentState = GameState.Wait;
         enabled = false;
         transform.rotation = Quaternion.identity;
         RenderCenter(holdArea.position);
 
-        if(heldBlock == null)
+        if(!_heldBlock)
         {
-            heldBlock = transform.gameObject;
-            FindObjectOfType<Spawner>().Spawn();
+            _heldBlock = transform.gameObject;
+            spawner.Spawn();
         } else {
-            heldBlock.TryGetComponent<Block>(out Block tempBlock);
+            _heldBlock.TryGetComponent(out Block tempBlock);
             {
                 tempBlock.enabled = true;
             }
-            heldBlock.transform.position = spawnPoint.position;
-            heldBlock = transform.gameObject;
+            _heldBlock.transform.position = spawnPoint.position;
+            _heldBlock = transform.gameObject;
         }
-        holdInTurn = true;
+        _holdInTurn = true;
         yield return null;
         GameManager.instance.currentState = GameState.Move;
     }
 
     private void AddToBoard()
     {
-        int minY, maxY;
-        minY = topLimit;
-        maxY = botLimit;
+        var minY = TopLimit;
+        var maxY = BottomLimit;
         foreach (Transform child in transform)
         {
             if(child.name == "Center") continue;
-            int xIndex = (int)child.position.x;
-            int yIndex = (int)child.position.y;
-            board[xIndex, yIndex] = child;
+            var xIndex = (int)child.position.x;
+            var yIndex = (int)child.position.y;
+            _board[xIndex, yIndex] = child;
             if (minY > yIndex) minY = yIndex;
             else if (maxY < yIndex) maxY = yIndex;
         }
         // check lines is full ?, todo refactor
-
-        for(int line = maxY; line >= minY; line--)
+        for(var line = maxY; line >= minY; line--)
         {
             if(IsFullLine(line))
             {
@@ -213,7 +208,7 @@ public class Block : MonoBehaviour
 
     private void CheckLines()
     {
-        for(int i = topLimit-1; i >= 0; i--)
+        for(int i = TopLimit-1; i >= 0; i--)
         {
             if(IsFullLine(i))
             {
@@ -223,36 +218,36 @@ public class Block : MonoBehaviour
         }
     }
 
-    private bool IsFullLine(int y)
+    private static bool IsFullLine(int y)
     {
-        for (int x = 0; x < rightLimit; x++)
+        for (int x = 0; x < RightLimit; x++)
         {
-            if (board[x, y] == null)
+            if (!_board[x, y])
                 return false;
         }
         return true;
     }
 
-    private void DeleteFullLine(int y)
+    private static void DeleteFullLine(int y)
     {
-        for (int x = 0; x < rightLimit; x++)
+        for (int x = 0; x < RightLimit; x++)
         {
-            Destroy(board[x, y].gameObject);
-            board[x, y] = null;
+            Destroy(_board[x, y].gameObject);
+            _board[x, y] = null;
         }
     }
 
-    private void RowDown(int i)
+    private static void RowDown(int i)
     {
-        for (int y = i; y < topLimit; y++)
+        for (int y = i; y < TopLimit; y++)
         {
-            for (int x = 0; x < rightLimit; x++)
+            for (int x = 0; x < RightLimit; x++)
             {
-                if(board[x, y] != null)
+                if(_board[x, y])
                 {
-                    board[x, y - 1] = board[x, y];
-                    board[x, y] = null;
-                    board[x, y - 1].position += Vector3.down;
+                    _board[x, y - 1] = _board[x, y];
+                    _board[x, y] = null;
+                    _board[x, y - 1].position += Vector3.down;
                 }
             }
         }
@@ -262,14 +257,14 @@ public class Block : MonoBehaviour
     {
         foreach (Transform child in transform)
         {
-            if(child.position.x < leftLimit || child.position.x > rightLimit || child.position.y <= botLimit)
+            if(child.position.x < LeftLimit || child.position.x > RightLimit || child.position.y <= BottomLimit)
             {
                 return false;
             }
 
             int xIndex = (int)child.position.x;
             int yIndex = (int)child.position.y;
-            if(board[xIndex, yIndex] != null)
+            if(_board[xIndex, yIndex]) 
                 return false;
         }
         return true;

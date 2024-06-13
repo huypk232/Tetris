@@ -1,9 +1,5 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.SceneManagement;
-using TMPro;
 
 public enum GameState
 {
@@ -16,7 +12,7 @@ public class GameManager : MonoBehaviour
 
     public GameObject level;
     public GameObject gameOverCanvas;
-    public GameObject ingameCanvas;
+    public GameObject inGameCanvas;
     public GameState currentState = GameState.Move;
 
     void Awake()
@@ -25,7 +21,7 @@ public class GameManager : MonoBehaviour
         {
             instance = this;
         }
-        // currentscore = 0;
+        // currentScore = 0;
         // LoadScore();
         Time.timeScale = 1f;
     }
@@ -33,14 +29,14 @@ public class GameManager : MonoBehaviour
     public void StartGame()
     {
         level.SetActive(true);
-        ingameCanvas.SetActive(false);
+        inGameCanvas.SetActive(false);
     }
 
     public void GameOver()
     {
         Time.timeScale = 0f;
-        GameObject spawnerGO = level.transform.Find("Spawner").gameObject;
-        if(spawnerGO.TryGetComponent<Spawner>(out Spawner spawner))
+        var spawnerGo = level.transform.Find("Spawner").gameObject;
+        if(spawnerGo.TryGetComponent<Spawner>(out var spawner))
         {
             spawner.enabled = false;
         }
@@ -50,17 +46,17 @@ public class GameManager : MonoBehaviour
 
     // public void SaveScore()
     // {
-    //     if(currentscore > highscore)
+    //     if(currentScore > highScore)
     //     {
-    //         SaveSystem.SaveScore(currentscore);
+    //         SaveSystem.SaveScore(currentScore);
     //     }
     // }
 
     // public void LoadScore()
     // {
     //     GameData data = SaveSystem.LoadScore();
-    //     if(data != null) highscore = data.highScore;
-    //     else highscore = 0;
+    //     if(data != null) highScore = data.highScore;
+    //     else highScore = 0;
     // }
  
     public void RestartGame()
