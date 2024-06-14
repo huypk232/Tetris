@@ -1,5 +1,4 @@
 using System.Collections;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public enum BlockType {
@@ -24,7 +23,7 @@ public class Block : MonoBehaviour
     private float _deltaFallTime;
 
     [Header("Share object")]
-    private static Transform[,] _board = new Transform[RightLimit,TopLimit]; // share among block instances
+    private static readonly Transform[] Board = new Transform[(RightLimit - LeftLimit) * (TopLimit - BottomLimit)]; // use 1 dimension array to optimize speed
     private static GameObject _heldBlock;
     private static bool _holdInTurn;
 
@@ -179,7 +178,7 @@ public class Block : MonoBehaviour
             if(child.name == "Center") continue;
             var xIndex = (int)child.position.x;
             var yIndex = (int)child.position.y;
-            _board[xIndex, yIndex] = child;
+            Board[GetIndexOnBoardTiles(xIndex, yIndex)] = child;
             if (minY > yIndex) minY = yIndex;
             else if (maxY < yIndex) maxY = yIndex;
         }
@@ -206,23 +205,11 @@ public class Block : MonoBehaviour
         return false;
     }
 
-    private void CheckLines()
-    {
-        for(int i = TopLimit-1; i >= 0; i--)
-        {
-            if(IsFullLine(i))
-            {
-                DeleteFullLine(i);
-                RowDown(i);
-            }
-        }
-    }
-
     private static bool IsFullLine(int y)
     {
         for (int x = 0; x < RightLimit; x++)
         {
-            if (!_board[x, y])
+            if (!Board[GetIndexOnBoardTiles(x, y)])
                 return false;
         }
         return true;
@@ -232,8 +219,8 @@ public class Block : MonoBehaviour
     {
         for (int x = 0; x < RightLimit; x++)
         {
-            Destroy(_board[x, y].gameObject);
-            _board[x, y] = null;
+            Destroy(Board[GetIndexOnBoardTiles(x, y)].gameObject);
+            Board[GetIndexOnBoardTiles(x, y)] = null;
         }
     }
 
@@ -243,11 +230,11 @@ public class Block : MonoBehaviour
         {
             for (int x = 0; x < RightLimit; x++)
             {
-                if(_board[x, y])
+                if(Board[(x + 1) * (y + 1) - 1])
                 {
-                    _board[x, y - 1] = _board[x, y];
-                    _board[x, y] = null;
-                    _board[x, y - 1].position += Vector3.down;
+                    Board[GetIndexOnBoardTiles(x, y - 1)] = Board[GetIndexOnBoardTiles(x, y)];
+                    Board[GetIndexOnBoardTiles(x, y)] = null;
+                    Board[GetIndexOnBoardTiles(x, y - 1)].position += Vector3.down;
                 }
             }
         }
@@ -264,9 +251,14 @@ public class Block : MonoBehaviour
 
             int xIndex = (int)child.position.x;
             int yIndex = (int)child.position.y;
-            if(_board[xIndex, yIndex]) 
+            if(Board[GetIndexOnBoardTiles(xIndex, yIndex)]) 
                 return false;
         }
         return true;
+    }
+
+    private static int GetIndexOnBoardTiles(int column, int row)
+    {
+        return row * (RightLimit - LeftLimit) + column;
     }
 }
