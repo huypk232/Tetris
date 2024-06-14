@@ -55,20 +55,21 @@ public class Board : MonoBehaviour
 
     private void Move()
     {
-        if(Input.GetKeyDown(KeyCode.LeftArrow))
+        if (Input.GetKeyDown(KeyCode.LeftArrow))
         {
-            _onBoardBlock.gameObject.transform.position += Vector3.left;
-            if(!ValidMovement()) _onBoardBlock.gameObject.transform.position += Vector3.right;
+            // _onBoardBlock.gameObject.transform.position += Vector3.left;
+            if (ValidMovement(_onBoardBlock, Vector3.left)) _onBoardBlock.gameObject.transform.position += Vector3.left;
         } else if (Input.GetKeyDown(KeyCode.RightArrow))
         {
-            _onBoardBlock.gameObject.transform.position += Vector3.right;
-            if(!ValidMovement()) _onBoardBlock.gameObject.transform.position += Vector3.left;
+            // _onBoardBlock.gameObject.transform.position += Vector3.right;
+            if (ValidMovement(_onBoardBlock, Vector3.right)) _onBoardBlock.gameObject.transform.position += Vector3.right;
         }
 
+        // todo
         if(Input.GetKeyDown(KeyCode.UpArrow))
         {
             _onBoardBlock.gameObject.transform.RotateAround(_onBoardBlock.rotationPoint.position, new Vector3(0, 0, 1), -90);
-            if(!ValidMovement()) 
+            if(!ValidMovement(_onBoardBlock, Vector3.zero)) 
                 _onBoardBlock.gameObject.transform.RotateAround(_onBoardBlock.rotationPoint.position, new Vector3(0, 0, 1), 90);
 
         }  
@@ -101,15 +102,16 @@ public class Board : MonoBehaviour
             {
                 if(Input.GetKey(KeyCode.DownArrow))
                 {
-                    _deltaFallTime -= 10 * Time.deltaTime;
+                    _deltaFallTime -= 20 * Time.deltaTime;
                 } else {
                     _deltaFallTime -= Time.deltaTime;
                 }
             } else {
-                _onBoardBlock.gameObject.transform.position += Vector3.down;
-                if(!ValidMovement()) 
+                // _onBoardBlock.gameObject.transform.position += Vector3.down;
+                if(ValidMovement(_onBoardBlock, Vector3.down)) 
                 {
-                    _onBoardBlock.gameObject.transform.position += Vector3.up;
+                    _onBoardBlock.gameObject.transform.position += Vector3.down;
+                    
                     AddToBoard();
                     if(IsFullCols()){
                         _onBoardBlock.enabled = false;
@@ -130,18 +132,18 @@ public class Board : MonoBehaviour
     {
         if (block)
             block.tag = "OnBoard";
-        Destroy(_onBoardBlock.gameObject);
+        // Destroy(_onBoardBlock.gameObject);
         _onBoardBlock = block;
     }
 
     private IEnumerator SmashCoroutine()
     {
         GameManager.instance.currentState = GameState.Wait;
-        while(ValidMovement())
+        while(ValidMovement(_onBoardBlock, Vector3.down))
         {
             _onBoardBlock.gameObject.transform.position += Vector3.down;
         }
-        _onBoardBlock.gameObject.transform.position += Vector3.up;
+        // _onBoardBlock.gameObject.transform.position += Vector3.up;
         yield return new WaitForSeconds(0.1f);
         GameManager.instance.currentState = GameState.Move;
     }
@@ -163,7 +165,7 @@ public class Board : MonoBehaviour
             {
                 tempBlock.enabled = true;
             }
-            _heldBlock.transform.position = spawnPoint.position;
+            _heldBlock.transform.position = spawnPoint.transform.position;
             _heldBlock = _onBoardBlock.gameObject;
         }
         _holdInTurn = true;
@@ -179,7 +181,7 @@ public class Board : MonoBehaviour
         Debug.Log("Maybe transform null: " + _onBoardBlock.gameObject);
         foreach (Transform child in _onBoardBlock.gameObject.transform)
         {
-            if(child.name == "Center") continue;
+            // if(child.name == "Center") continue;
             var xIndex = (int)child.position.x;
             var yIndex = (int)child.position.y;
             _tiles[xIndex][yIndex] = child;
@@ -223,7 +225,7 @@ public class Board : MonoBehaviour
 
     private static bool IsFullLine(int y)
     {
-        for (int x = 0; x < RightLimit; x++)
+        for (int x = 0; x < RightLimit - LeftLimit; x++)
         {
             if (!_tiles[x][y])
                 return false;
@@ -256,20 +258,21 @@ public class Board : MonoBehaviour
         }
     }
 
-    public bool ValidMovement()
+    public bool ValidMovement(Block block, Vector3 offsetPosition)
     {
-        foreach (Transform child in _onBoardBlock.gameObject.transform)
+        foreach (Transform child in block.gameObject.transform)
         {
-            if(child.position.x < LeftLimit || child.position.x > RightLimit || child.position.y <= BottomLimit)
+            if (child.position.x < LeftLimit || child.position.x > RightLimit || child.position.y <= BottomLimit)
             {
                 return false;
             }
 
-            int xIndex = (int)child.position.x;
-            int yIndex = (int)child.position.y;
-            if(_tiles[xIndex][yIndex]) 
+            int xIndex = (int)(child.position.x + offsetPosition.x);
+            int yIndex = (int)(child.position.y + offsetPosition.y);
+            if (_tiles[xIndex][yIndex])
                 return false;
         }
+
         return true;
     }
 }

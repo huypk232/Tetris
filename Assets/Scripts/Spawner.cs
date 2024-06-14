@@ -42,14 +42,12 @@ public class Spawner : MonoBehaviour
         nextBlocks[0].transform.position = transform.position;
         if( nextBlocks[0].TryGetComponent(out Block nextBlock))
         {
-            Debug.Log("next bloack tag " + nextBlocks[0].tag);
-            board.SetOnBoardBlock(ref nextBlock);
-            if(board.ValidMovement()){
+            // board.ValidMovement(nextBlock, Vector3.down);
+            if(board.ValidMovement(nextBlock, Vector3.down)){
                 nextBlock.enabled = true;
+                board.SetOnBoardBlock(ref nextBlock);
             } else
             {
-                Block dummyBlock = null;
-                board.SetOnBoardBlock(ref dummyBlock);
                 nextBlocks[0].transform.position = oldPosition;
                 GameManager.instance.GameOver();
                 return;
