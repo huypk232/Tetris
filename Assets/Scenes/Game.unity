@@ -1472,7 +1472,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   level: {fileID: 1614717040}
   gameOverCanvas: {fileID: 1651575196}
-  ingameCanvas: {fileID: 236470738}
+  inGameCanvas: {fileID: 0}
   currentState: 0
 --- !u!1 &829767554
 GameObject:
@@ -1518,7 +1518,6 @@ MonoBehaviour:
   - {fileID: 415555854}
   - {fileID: 20549351}
   holdArea: {fileID: 1761687360}
-  holdInTurn: 0
 --- !u!4 &829767556
 Transform:
   m_ObjectHideFlags: 0
@@ -2651,6 +2650,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1688289847}
   - component: {fileID: 1688289846}
+  - component: {fileID: 1688289848}
   m_Layer: 0
   m_Name: Board
   m_TagString: Untagged
@@ -2728,6 +2728,21 @@ Transform:
   - {fileID: 1974332681}
   m_Father: {fileID: 1614717041}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1688289848
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1688289845}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2dc376eab1ad827b91896ce0fff8a31, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  type: 0
+  rotationPoint: {fileID: 0}
+  centerOffset: {x: 0, y: 0, z: 0}
 --- !u!1 &1761687359
 GameObject:
   m_ObjectHideFlags: 0
