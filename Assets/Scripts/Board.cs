@@ -2,20 +2,10 @@ using System.Collections;
 using Unity.VisualScripting;
 using UnityEngine;
 
-public enum BlockType {
-    I = 0,
-    J = 1,
-    L = 2,
-    O = 3,
-    S = 4,
-    T = 5,
-    Z = 6,
-}
-
-public class Block : MonoBehaviour
+public class Board : MonoBehaviour
 {
     [SerializeField] private BlockType type;
-    public Transform rotationPoint;
+    [SerializeField] private Transform rotationPoint;
     private const int LeftLimit = 0;
     private const int RightLimit = 10;
     private const int BottomLimit = 0;
@@ -24,60 +14,62 @@ public class Block : MonoBehaviour
     private float _deltaFallTime;
 
     [Header("Share object")]
-    private static Transform[,] _board = new Transform[RightLimit,TopLimit]; // share among block instances
+    private static Transform[][] _tiles = new Transform[RightLimit - LeftLimit][];
     private static GameObject _heldBlock;
     private static bool _holdInTurn;
 
-    public Transform holdArea;
+    [SerializeField] private Transform holdArea;
     [SerializeField] private Transform spawnPoint;
     [SerializeField] private Spawner spawner;
     
     [Tooltip("Offset center to modify when rendering")]
     [SerializeField] private Vector3 centerOffset;
 
+    private Block _onBoardBlock;
+
+    private void Awake() {
+        for (int column = 0; column < RightLimit - LeftLimit; column++)
+        {
+            _tiles[column] = new Transform[TopLimit - BottomLimit];
+        }
+    }
+
     private void Start()
     {
         holdArea = GameObject.Find("/Level/Hold Area/Hold").transform;
         spawnPoint = GameObject.Find("/Level/Spawner").transform;
         spawner = FindObjectOfType<Spawner>();
+        _onBoardBlock = GameObject.FindGameObjectWithTag("OnBoard").GetComponent<Block>();
         _deltaFallTime = FallTime;
     }
 
     private void Update()
     {
-        // if (GameManager.instance.currentState == GameState.Move)
-        // {
-        //     Move();
-        //     HoldAndFall();
-        //     // Hold();
-        // }
-        
-    }
-
-    // render center to destination des
-    public void RenderCenter(Vector3 des)
-    {
-        transform.position = des;
-        transform.position += des - transform.TransformPoint(centerOffset);
+        if (GameManager.instance.currentState == GameState.Move)
+        {
+            Move();
+            HoldAndFall();
+            // Hold();
+        }
     }
 
     private void Move()
     {
         if(Input.GetKeyDown(KeyCode.LeftArrow))
         {
-            transform.position += Vector3.left;
-            if(!ValidMovement()) transform.position += Vector3.right;
+            _onBoardBlock.gameObject.transform.position += Vector3.left;
+            if(!ValidMovement()) _onBoardBlock.gameObject.transform.position += Vector3.right;
         } else if (Input.GetKeyDown(KeyCode.RightArrow))
         {
-            transform.position += Vector3.right;
-            if(!ValidMovement()) transform.position += Vector3.left;
+            _onBoardBlock.gameObject.transform.position += Vector3.right;
+            if(!ValidMovement()) _onBoardBlock.gameObject.transform.position += Vector3.left;
         }
 
         if(Input.GetKeyDown(KeyCode.UpArrow))
         {
-            transform.RotateAround(rotationPoint.position, new Vector3(0, 0, 1), -90);
+            _onBoardBlock.gameObject.transform.RotateAround(_onBoardBlock.rotationPoint.position, new Vector3(0, 0, 1), -90);
             if(!ValidMovement()) 
-                transform.RotateAround(rotationPoint.position, new Vector3(0, 0, 1), 90);
+                _onBoardBlock.gameObject.transform.RotateAround(_onBoardBlock.rotationPoint.position, new Vector3(0, 0, 1), 90);
 
         }  
     }
@@ -90,11 +82,11 @@ public class Block : MonoBehaviour
             AddToBoard();
             if(IsFullCols())
             {
-                enabled = false;
+                _onBoardBlock.enabled = false;
                 GameManager.instance.GameOver();
                 return;
             }
-            enabled = false;
+            _onBoardBlock.enabled = false;
             spawner.Spawn();
             _holdInTurn = false; // refactor
             GameManager.instance.currentState = GameState.Move;
@@ -114,17 +106,17 @@ public class Block : MonoBehaviour
                     _deltaFallTime -= Time.deltaTime;
                 }
             } else {
-                transform.position += Vector3.down;
+                _onBoardBlock.gameObject.transform.position += Vector3.down;
                 if(!ValidMovement()) 
                 {
-                    transform.position += Vector3.up;
+                    _onBoardBlock.gameObject.transform.position += Vector3.up;
                     AddToBoard();
                     if(IsFullCols()){
-                        enabled = false;
+                        _onBoardBlock.enabled = false;
                         GameManager.instance.GameOver();
                         return;
                     }
-                    enabled = false;
+                    _onBoardBlock.enabled = false;
                     spawner.Spawn();
                     _holdInTurn = false; // refactor
                 }
@@ -134,14 +126,22 @@ public class Block : MonoBehaviour
         
     }
 
+    public void SetOnBoardBlock(ref Block block)
+    {
+        if (block)
+            block.tag = "OnBoard";
+        Destroy(_onBoardBlock.gameObject);
+        _onBoardBlock = block;
+    }
+
     private IEnumerator SmashCoroutine()
     {
         GameManager.instance.currentState = GameState.Wait;
         while(ValidMovement())
         {
-            transform.position += Vector3.down;
+            _onBoardBlock.gameObject.transform.position += Vector3.down;
         }
-        transform.position += Vector3.up;
+        _onBoardBlock.gameObject.transform.position += Vector3.up;
         yield return new WaitForSeconds(0.1f);
         GameManager.instance.currentState = GameState.Move;
     }
@@ -150,13 +150,13 @@ public class Block : MonoBehaviour
     private IEnumerator HoldCoroutine()
     {
         GameManager.instance.currentState = GameState.Wait;
-        enabled = false;
-        transform.rotation = Quaternion.identity;
-        RenderCenter(holdArea.position);
+        _onBoardBlock.enabled = false;
+        _onBoardBlock.gameObject.transform.rotation = Quaternion.identity;
+        _onBoardBlock.RenderCenter(holdArea.position);
 
         if(!_heldBlock)
         {
-            _heldBlock = transform.gameObject;
+            _heldBlock = _onBoardBlock.gameObject;
             spawner.Spawn();
         } else {
             _heldBlock.TryGetComponent(out Block tempBlock);
@@ -164,7 +164,7 @@ public class Block : MonoBehaviour
                 tempBlock.enabled = true;
             }
             _heldBlock.transform.position = spawnPoint.position;
-            _heldBlock = transform.gameObject;
+            _heldBlock = _onBoardBlock.gameObject;
         }
         _holdInTurn = true;
         yield return null;
@@ -175,12 +175,14 @@ public class Block : MonoBehaviour
     {
         var minY = TopLimit;
         var maxY = BottomLimit;
-        foreach (Transform child in transform)
+        Debug.Log("Maybe null: " + _onBoardBlock);
+        Debug.Log("Maybe transform null: " + _onBoardBlock.gameObject);
+        foreach (Transform child in _onBoardBlock.gameObject.transform)
         {
             if(child.name == "Center") continue;
             var xIndex = (int)child.position.x;
             var yIndex = (int)child.position.y;
-            _board[xIndex, yIndex] = child;
+            _tiles[xIndex][yIndex] = child;
             if (minY > yIndex) minY = yIndex;
             else if (maxY < yIndex) maxY = yIndex;
         }
@@ -197,7 +199,7 @@ public class Block : MonoBehaviour
 
     private bool IsFullCols()
     {
-        foreach(Transform child in transform)
+        foreach(Transform child in _onBoardBlock.gameObject.transform)
         {
             int yIndex = (int)child.position.y;
 
@@ -223,7 +225,7 @@ public class Block : MonoBehaviour
     {
         for (int x = 0; x < RightLimit; x++)
         {
-            if (!_board[x, y])
+            if (!_tiles[x][y])
                 return false;
         }
         return true;
@@ -233,8 +235,8 @@ public class Block : MonoBehaviour
     {
         for (int x = 0; x < RightLimit; x++)
         {
-            Destroy(_board[x, y].gameObject);
-            _board[x, y] = null;
+            Destroy(_tiles[x][y].gameObject);
+            _tiles[x][y] = null;
         }
     }
 
@@ -244,11 +246,11 @@ public class Block : MonoBehaviour
         {
             for (int x = 0; x < RightLimit; x++)
             {
-                if(_board[x, y])
+                if(_tiles[x][y])
                 {
-                    _board[x, y - 1] = _board[x, y];
-                    _board[x, y] = null;
-                    _board[x, y - 1].position += Vector3.down;
+                    _tiles[x][y - 1] = _tiles[x][y];
+                    _tiles[x][y] = null;
+                    _tiles[x][y - 1].position += Vector3.down;
                 }
             }
         }
@@ -256,7 +258,7 @@ public class Block : MonoBehaviour
 
     public bool ValidMovement()
     {
-        foreach (Transform child in transform)
+        foreach (Transform child in _onBoardBlock.gameObject.transform)
         {
             if(child.position.x < LeftLimit || child.position.x > RightLimit || child.position.y <= BottomLimit)
             {
@@ -265,7 +267,7 @@ public class Block : MonoBehaviour
 
             int xIndex = (int)child.position.x;
             int yIndex = (int)child.position.y;
-            if(_board[xIndex, yIndex]) 
+            if(_tiles[xIndex][yIndex]) 
                 return false;
         }
         return true;

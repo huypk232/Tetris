@@ -12,12 +12,16 @@ public class Spawner : MonoBehaviour
     private GameObject holdBlock;
 
     public bool holdInTurn = false;
-
-    void Start()
+    [SerializeField] private Board board;
+    
+    void Awake()
     {
         int firstRandomIndex = Random.Range(0, blocks.Length);
-        GameObject firstBlock = Instantiate(blocks[firstRandomIndex], transform.position, Quaternion.identity);
-
+        Block firstBlock = Instantiate(blocks[firstRandomIndex], transform.position, Quaternion.identity).GetComponent<Block>();
+        firstBlock.gameObject.tag = "OnBoard";
+        Debug.Log("tag: " + firstBlock.gameObject.tag);
+        // board.SetOnBoardBlock(ref firstBlock);
+        
         // Spawn block in next area
         while(nextBlocks.Count < 5)
         {
@@ -36,11 +40,16 @@ public class Spawner : MonoBehaviour
     {
         var oldPosition = nextBlocks[0].transform.position;
         nextBlocks[0].transform.position = transform.position;
-        if( nextBlocks[0].TryGetComponent<Block>(out Block nextBlock))
+        if( nextBlocks[0].TryGetComponent(out Block nextBlock))
         {
-            if(nextBlock.ValidMovement()){
+            Debug.Log("next bloack tag " + nextBlocks[0].tag);
+            board.SetOnBoardBlock(ref nextBlock);
+            if(board.ValidMovement()){
                 nextBlock.enabled = true;
-            } else {
+            } else
+            {
+                Block dummyBlock = null;
+                board.SetOnBoardBlock(ref dummyBlock);
                 nextBlocks[0].transform.position = oldPosition;
                 GameManager.instance.GameOver();
                 return;
@@ -56,12 +65,12 @@ public class Spawner : MonoBehaviour
         
     }
 
-    public void Hold(GameObject blockGO)
+    public void Hold(GameObject blockGo)
     {
         if(!holdInTurn)
         {
-            blockGO.transform.rotation = Quaternion.identity;
-            if(blockGO.TryGetComponent<Block>(out Block block))
+            blockGo.transform.rotation = Quaternion.identity;
+            if(blockGo.TryGetComponent<Block>(out Block block))
             {
                 block.RenderCenter(holdArea.position);
                 block.enabled = false;
@@ -69,7 +78,7 @@ public class Spawner : MonoBehaviour
 
             if(holdBlock == null)
             {
-                holdBlock = blockGO;
+                holdBlock = blockGo;
                 Spawn();
             } else {
                 holdBlock.TryGetComponent<Block>(out Block tempBlock);
@@ -77,7 +86,7 @@ public class Spawner : MonoBehaviour
                     tempBlock.enabled = true;
                 }
                 holdBlock.transform.position = transform.position;
-                holdBlock = blockGO;
+                holdBlock = blockGo;
             }
             holdInTurn = true;
         } else return;
@@ -88,7 +97,7 @@ public class Spawner : MonoBehaviour
         // change position block in next area
         for (int i = 0; i < nextBlocks.Count; i++)
         {
-            if(nextBlocks[i].TryGetComponent<Block>(out Block nextBlock))
+            if(nextBlocks[i].TryGetComponent(out Block nextBlock))
             {
                 nextBlock.RenderCenter(nextAreas[i].position);
             }
@@ -99,7 +108,7 @@ public class Spawner : MonoBehaviour
         GameObject newBlock = Instantiate(blocks[randomIndex], nextAreas[4].position, Quaternion.identity);
 
 
-        if(newBlock.TryGetComponent<Block>(out Block block))
+        if(newBlock.TryGetComponent(out Block block))
         {
             block.RenderCenter(nextAreas[4].position);
             block.enabled = false;
