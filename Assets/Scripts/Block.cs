@@ -16,7 +16,9 @@ public class Block : MonoBehaviour
     [SerializeField] private BlockType type;
     [SerializeField] private Transform rotationPoint;
     [SerializeField] private Transform centerPoint;
-
+    [SerializeField] private Material shadowMaterial;
+    [SerializeField] private Material tilePrefab;
+    
     private const int LeftLimit = 0;
     private const int RightLimit = 10;
     private const int BottomLimit = 0;
