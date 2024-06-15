@@ -8,89 +8,56 @@ public class Spawner : MonoBehaviour
     public Transform[] nextAreas;
     public Transform holdArea;
 
-    private List<GameObject> nextBlocks = new List<GameObject>();
-    private GameObject holdBlock;
+    private List<GameObject> _nextBlocks = new List<GameObject>();
+    private GameObject _holdBlock;
 
     public bool holdInTurn = false;
 
     void Start()
     {
         int firstRandomIndex = Random.Range(0, blocks.Length);
-        GameObject firstBlock = Instantiate(blocks[firstRandomIndex], transform.position, Quaternion.identity);
+        Instantiate(blocks[firstRandomIndex], transform.position, Quaternion.identity);
 
         // Spawn block in next area
-        while(nextBlocks.Count < 5)
+        while(_nextBlocks.Count < 5)
         {
             int randomIndex = Random.Range(0, blocks.Length);
-            GameObject newBlock = Instantiate(blocks[randomIndex], nextAreas[nextBlocks.Count].position, Quaternion.identity);
-            if(newBlock.TryGetComponent<Block>(out Block block))
+            GameObject newBlock = Instantiate(blocks[randomIndex], nextAreas[_nextBlocks.Count].position, Quaternion.identity);
+            if(newBlock.TryGetComponent(out Block block))
             {
-                block.RenderCenter(nextAreas[nextBlocks.Count].position);
+                block.MoveTo(nextAreas[_nextBlocks.Count].position);
                 block.enabled = false;
             }
-            nextBlocks.Add(newBlock);
+            _nextBlocks.Add(newBlock);
         }
     }
 
     public void Spawn()
     {
-        var oldPosition = nextBlocks[0].transform.position;
-        nextBlocks[0].transform.position = transform.position;
-        if( nextBlocks[0].TryGetComponent<Block>(out Block nextBlock))
+        var oldPosition = _nextBlocks[0].transform.position;
+        _nextBlocks[0].transform.position = transform.position;
+        if( _nextBlocks[0].TryGetComponent(out Block nextBlock))
         {
             if(nextBlock.ValidMovement()){
                 nextBlock.enabled = true;
             } else {
-                nextBlocks[0].transform.position = oldPosition;
-                GameManager.instance.GameOver();
+                _nextBlocks[0].transform.localPosition = oldPosition;
+                GameManager.Instance.GameOver();
                 return;
             }
         }
-        nextBlocks.RemoveAt(0);
+        _nextBlocks.RemoveAt(0);
         UpdateNextBlocks();
-        holdInTurn = false;
-    }
-
-    private void LoadNextBlock()
-    {
-        
-    }
-
-    public void Hold(GameObject blockGO)
-    {
-        if(!holdInTurn)
-        {
-            blockGO.transform.rotation = Quaternion.identity;
-            if(blockGO.TryGetComponent<Block>(out Block block))
-            {
-                block.RenderCenter(holdArea.position);
-                block.enabled = false;
-            }
-
-            if(holdBlock == null)
-            {
-                holdBlock = blockGO;
-                Spawn();
-            } else {
-                holdBlock.TryGetComponent<Block>(out Block tempBlock);
-                {
-                    tempBlock.enabled = true;
-                }
-                holdBlock.transform.position = transform.position;
-                holdBlock = blockGO;
-            }
-            holdInTurn = true;
-        } else return;
     }
 
     private void UpdateNextBlocks()
     {
         // change position block in next area
-        for (int i = 0; i < nextBlocks.Count; i++)
+        for (int i = 0; i < _nextBlocks.Count; i++)
         {
-            if(nextBlocks[i].TryGetComponent<Block>(out Block nextBlock))
+            if(_nextBlocks[i].TryGetComponent(out Block nextBlock))
             {
-                nextBlock.RenderCenter(nextAreas[i].position);
+                nextBlock.MoveTo(nextAreas[i].position);
             }
         }
 
@@ -99,12 +66,12 @@ public class Spawner : MonoBehaviour
         GameObject newBlock = Instantiate(blocks[randomIndex], nextAreas[4].position, Quaternion.identity);
 
 
-        if(newBlock.TryGetComponent<Block>(out Block block))
+        if(newBlock.TryGetComponent(out Block block))
         {
-            block.RenderCenter(nextAreas[4].position);
+            block.MoveTo(nextAreas[4].position);
             block.enabled = false;
         }
-        nextBlocks.Add(newBlock);
+        _nextBlocks.Add(newBlock);
     }
 
 }

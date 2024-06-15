@@ -8,7 +8,7 @@ public enum GameState
 
 public class GameManager : MonoBehaviour
 {
-    public static GameManager instance;
+    public static GameManager Instance;
 
     public GameObject level;
     public GameObject gameOverCanvas;
@@ -17,9 +17,9 @@ public class GameManager : MonoBehaviour
 
     void Awake()
     {
-        if (instance == null)
+        if (Instance == null)
         {
-            instance = this;
+            Instance = this;
         }
         // currentScore = 0;
         // LoadScore();
@@ -35,7 +35,7 @@ public class GameManager : MonoBehaviour
     public void GameOver()
     {
         Time.timeScale = 0f;
-        var spawnerGo = level.transform.Find("Spawner").gameObject;
+        var spawnerGo = FindObjectOfType<Spawner>();
         if(spawnerGo.TryGetComponent<Spawner>(out var spawner))
         {
             spawner.enabled = false;
