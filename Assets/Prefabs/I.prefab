@@ -1,5 +1,36 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &4833737608456408831
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7057078642308529508}
+  m_Layer: 0
+  m_Name: Center
+  m_TagString: CenterPoint
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7057078642308529508
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4833737608456408831}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.5, z: -0.0027098279}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5701043314552787484}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &7730502143098947005
 GameObject:
   m_ObjectHideFlags: 0
@@ -10,6 +41,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5701043314552787484}
   - component: {fileID: 4194559757229031228}
+  - component: {fileID: -893533691730542664}
   m_Layer: 0
   m_Name: I
   m_TagString: Untagged
@@ -34,6 +66,7 @@ Transform:
   - {fileID: 6922480364215356992}
   - {fileID: 176011629720890716}
   - {fileID: 8647342919790535123}
+  - {fileID: 7057078642308529508}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &4194559757229031228
@@ -50,10 +83,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   type: 0
   rotationPoint: {fileID: 6922480364215356992}
-  holdArea: {fileID: 0}
-  spawnPoint: {fileID: 0}
-  spawner: {fileID: 0}
-  centerOffset: {x: 0, y: 0, z: 0}
+  centerPoint: {fileID: 7057078642308529508}
+--- !u!114 &-893533691730542664
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7730502143098947005}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c87c90e1fb3f88847b0c8473e2e6289b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &2137245146993154826
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -68,11 +110,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2294676945481086550, guid: 9b8272785073faf4ba9f56eb849698d4, type: 3}
       propertyPath: m_LocalScale.x
-      value: 0.9
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2294676945481086550, guid: 9b8272785073faf4ba9f56eb849698d4, type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.9
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2294676945481086550, guid: 9b8272785073faf4ba9f56eb849698d4, type: 3}
       propertyPath: m_LocalPosition.x
@@ -206,11 +248,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2294676945481086550, guid: 9b8272785073faf4ba9f56eb849698d4, type: 3}
       propertyPath: m_LocalScale.x
-      value: 0.9
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2294676945481086550, guid: 9b8272785073faf4ba9f56eb849698d4, type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.9
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2294676945481086550, guid: 9b8272785073faf4ba9f56eb849698d4, type: 3}
       propertyPath: m_LocalPosition.x
@@ -344,11 +386,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2294676945481086550, guid: 9b8272785073faf4ba9f56eb849698d4, type: 3}
       propertyPath: m_LocalScale.x
-      value: 0.9
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2294676945481086550, guid: 9b8272785073faf4ba9f56eb849698d4, type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.9
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2294676945481086550, guid: 9b8272785073faf4ba9f56eb849698d4, type: 3}
       propertyPath: m_LocalPosition.x
@@ -482,11 +524,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2294676945481086550, guid: 9b8272785073faf4ba9f56eb849698d4, type: 3}
       propertyPath: m_LocalScale.x
-      value: 0.9
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2294676945481086550, guid: 9b8272785073faf4ba9f56eb849698d4, type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.9
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2294676945481086550, guid: 9b8272785073faf4ba9f56eb849698d4, type: 3}
       propertyPath: m_LocalPosition.x
