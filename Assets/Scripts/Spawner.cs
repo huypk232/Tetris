@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class Spawner : MonoBehaviour
 {
@@ -8,20 +9,34 @@ public class Spawner : MonoBehaviour
     public Transform[] nextAreas;
     public Transform holdArea;
 
+    private const int TotalBlocks = 7;
+    
     private List<GameObject> _nextBlocks = new List<GameObject>();
     private GameObject _holdBlock;
-
-    public bool holdInTurn = false;
+    private int[] _spawnCounter = new int[TotalBlocks];
+    private int _remainBlockInCycle;
 
     void Start()
     {
+        InitSpawnCounter();
+        
         int firstRandomIndex = Random.Range(0, blocks.Length);
+        _spawnCounter[firstRandomIndex]--;
+        _remainBlockInCycle--;
+        
         Instantiate(blocks[firstRandomIndex], transform.position, Quaternion.identity);
 
         // Spawn block in next area
         while(_nextBlocks.Count < 5)
         {
-            int randomIndex = Random.Range(0, blocks.Length);
+            int randomIndex;
+            do
+            {
+                randomIndex = Random.Range(0, blocks.Length);
+            } while (_spawnCounter[randomIndex] == 0);
+
+            _spawnCounter[randomIndex]--;
+            _remainBlockInCycle--;
             GameObject newBlock = Instantiate(blocks[randomIndex], nextAreas[_nextBlocks.Count].position, Quaternion.identity);
             if(newBlock.TryGetComponent(out Block block))
             {
@@ -30,6 +45,17 @@ public class Spawner : MonoBehaviour
             }
             _nextBlocks.Add(newBlock);
         }
+    }
+
+    private void InitSpawnCounter()
+    {
+        for (int i = 0; i < _spawnCounter.Length; i++)
+        {
+            var randomQuantity = Random.Range(1, 3);
+            _spawnCounter[i] = randomQuantity;
+            _remainBlockInCycle += randomQuantity;
+        }
+              
     }
 
     public void Spawn()
@@ -61,8 +87,18 @@ public class Spawner : MonoBehaviour
             }
         }
 
+        if (_remainBlockInCycle <= 0)
+            InitSpawnCounter();
+        int randomIndex;
+        do
+        {
+            randomIndex = Random.Range(0, blocks.Length);
+        } while (_spawnCounter[randomIndex] == 0);
+
+        _spawnCounter[randomIndex]--;
+        _remainBlockInCycle--;
+        
         // spawn new block to next area
-        int randomIndex = Random.Range(0, blocks.Length);
         GameObject newBlock = Instantiate(blocks[randomIndex], nextAreas[4].position, Quaternion.identity);
 
 
