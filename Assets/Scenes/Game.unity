@@ -1434,7 +1434,6 @@ MonoBehaviour:
   - {fileID: 415555854}
   - {fileID: 20549351}
   holdArea: {fileID: 1761687360}
-  holdInTurn: 0
 --- !u!4 &829767556
 Transform:
   m_ObjectHideFlags: 0

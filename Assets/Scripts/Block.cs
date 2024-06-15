@@ -16,7 +16,9 @@ public class Block : MonoBehaviour
     [SerializeField] private BlockType type;
     [SerializeField] private Transform rotationPoint;
     [SerializeField] private Transform centerPoint;
-
+    [SerializeField] private Material shadowMaterial;
+    [SerializeField] private Material tilePrefab;
+    
     private const int LeftLimit = 0;
     private const int RightLimit = 10;
     private const int BottomLimit = 0;
@@ -174,14 +176,14 @@ public class Block : MonoBehaviour
         var maxY = BottomLimit;
         foreach (Transform child in transform)
         {
-            if(child.name == "Center" || child.gameObject.CompareTag("CenterPoint")) continue;
+            if(child.gameObject.CompareTag("CenterPoint")) 
+                continue;
             var xIndex = (int)child.position.x;
             var yIndex = (int)child.position.y;
             Board[GetIndexOnBoardTiles(xIndex, yIndex)] = child;
             if (minY > yIndex) minY = yIndex;
-            else if (maxY < yIndex) maxY = yIndex;
+            if (maxY < yIndex) maxY = yIndex;
         }
-        // check lines is full ?, todo refactor
         for(var line = maxY; line >= minY; line--)
         {
             if(IsFullRow(line))
@@ -208,9 +210,9 @@ public class Block : MonoBehaviour
 
     private static bool IsFullRow(int y)
     {
-        for (int x = 0; x < RightLimit; x++)
+        for (int column = LeftLimit; column < RightLimit - LeftLimit; column++)
         {
-            if (!Board[GetIndexOnBoardTiles(x, y)])
+            if (!Board[GetIndexOnBoardTiles(column, y)])
                 return false;
         }
         return true;
@@ -229,7 +231,7 @@ public class Block : MonoBehaviour
     {
         for (int y = i; y < TopLimit; y++)
         {
-            for (int x = 0; x < RightLimit; x++)
+            for (int x = LeftLimit; x < RightLimit - LeftLimit; x++)
             {
                 if(Board[GetIndexOnBoardTiles(x, y)])
                 {
