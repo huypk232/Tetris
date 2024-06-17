@@ -4,6 +4,8 @@ using Random = UnityEngine.Random;
 
 public class Spawner : MonoBehaviour
 {
+    [SerializeField] private Shadow shadow;
+    
     [Tooltip("I_Block, J_Block, L_Block, O_Block, S_Block, T_Block, Z_Block")]
     public GameObject[] blocks;
     public Transform[] nextAreas;
@@ -24,8 +26,10 @@ public class Spawner : MonoBehaviour
         _spawnCounter[firstRandomIndex]--;
         _remainBlockInCycle--;
         
-        Instantiate(blocks[firstRandomIndex], transform.position, Quaternion.identity);
-
+        Block firstBlock = Instantiate(blocks[firstRandomIndex], transform.position, Quaternion.identity).GetComponent<Block>();
+        firstBlock.tag = "OnBoardBlock";
+        shadow.UpsertCurrentClone(ref firstBlock);
+        
         // Spawn block in next area
         while(_nextBlocks.Count < 5)
         {
@@ -66,6 +70,7 @@ public class Spawner : MonoBehaviour
         {
             if(nextBlock.ValidMovement()){
                 nextBlock.enabled = true;
+                nextBlock.tag = "OnBoardBlock";
             } else {
                 _nextBlocks[0].transform.localPosition = oldPosition;
                 GameManager.Instance.GameOver();

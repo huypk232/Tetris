@@ -1,25 +1,13 @@
 using System.Collections;
 using UnityEngine;
 
-public enum BlockType {
-    None = 0,
-    I = 1,
-    J = 2,
-    L = 3,
-    O = 4,
-    S = 5,
-    T = 6,
-    Z = 7,
-}
-
-public class Block : MonoBehaviour
+public class Shadow : MonoBehaviour
 {
     [SerializeField] private BlockType type;
     [SerializeField] private Transform rotationPoint;
     [SerializeField] private Transform centerPoint;
     [SerializeField] private Material shadowMaterial;
-    [SerializeField] private Material tilePrefab;
-    [SerializeField] private Shadow shadow;
+    [SerializeField] private GameObject shadowTilePrefab;
     
     private const int LeftLimit = 0;
     private const int RightLimit = 10;
@@ -28,34 +16,42 @@ public class Block : MonoBehaviour
     private const float FallTime = 1f;
     private float _deltaFallTime;
 
-    private static readonly Transform[] Board = new Transform[(RightLimit - LeftLimit) * (TopLimit - BottomLimit)]; // use 1 dimension array to optimize speed
+    private static readonly Transform[] ShadowBoard = new Transform[(RightLimit - LeftLimit) * (TopLimit - BottomLimit)]; // use 1 dimension array to optimize speed
     private static GameObject _heldBlock;
     private static bool _holdInTurn;
 
     private Transform _holdArea;
     private Transform _spawnPoint;
     private Spawner _spawner;
+    private Block _currentControlBlock;
     
     [Tooltip("Offset center to modify when rendering")]
-
-    private void Start()
-    {
-        _holdArea = GameObject.Find("/HoldArea/Hold").transform;
-        _spawnPoint = GameObject.Find("/Spawner").transform;
-        _spawner = FindObjectOfType<Spawner>();
-        _deltaFallTime = FallTime;
-    }
+    
 
     private void Update()
     {
         if (GameManager.Instance.currentState == GameState.Move)
         {
-            Move();
-            HoldAndFall();
+            // Move();
+            // Smash();
+            // HoldAndFall();
             // Hold();
         }
     }
 
+    public void UpsertCurrentClone(ref Block onBoardBlock)
+    {
+        foreach (Transform child in transform)
+        {
+            Destroy(child.gameObject);
+        }
+        Debug.Log("done");
+        foreach (Transform tile in _currentControlBlock.gameObject.transform)
+        {
+            Instantiate(shadowTilePrefab, tile.position, Quaternion.identity, transform);
+        }
+    }
+    
     // move to des and render center pos
     public void MoveTo(Vector3 des)
     {
@@ -84,59 +80,20 @@ public class Block : MonoBehaviour
         }  
     }
 
-    private void HoldAndFall()
+    private void Smash()
     {
-        if(Input.GetKeyDown(KeyCode.Space))
-        {
-            StartCoroutine(SmashCoroutine());
-            AddToBoard();
-            if(IsFullCols())
-            {
-                enabled = false;
-                GameManager.Instance.GameOver();
-                return;
-            }
-            gameObject.tag = "Untagged";
-            enabled = false;
-            _spawner.Spawn();
-            _holdInTurn = false; // refactor
-            GameManager.Instance.currentState = GameState.Move;
-        } else if(Input.GetKeyDown(KeyCode.C)) {
-            if(!_holdInTurn)
-            {
-                StartCoroutine(HoldCoroutine());
-            }
-        } else {
-            
-            if(_deltaFallTime > 0.0f)
-            {
-                if(Input.GetKey(KeyCode.DownArrow))
-                {
-                    _deltaFallTime -= 20 * Time.deltaTime;
-                } else {
-                    _deltaFallTime -= Time.deltaTime;
-                }
-            } else {
-                transform.position += Vector3.down;
-                if(!ValidMovement()) 
-                {
-                    transform.position += Vector3.up;
-                    AddToBoard();
-                    if(IsFullCols()){
-                        gameObject.tag = "Untagged";
-                        enabled = false;
-                        GameManager.Instance.GameOver();
-                        return;
-                    }
-                    gameObject.tag = "Untagged";
-                    enabled = false;
-                    _spawner.Spawn();
-                    _holdInTurn = false; // refactor
-                }
-                _deltaFallTime = FallTime;
-            }   
-        } 
-        
+        StartCoroutine(SmashCoroutine());
+        // AddToBoard();
+        // if(IsFullCols())
+        // {
+        //     enabled = false;
+        //     GameManager.Instance.GameOver();
+        //     return;
+        // }
+        // enabled = false;
+        // _spawner.Spawn();
+        // _holdInTurn = false; // refactor
+        GameManager.Instance.currentState = GameState.Move;
     }
 
     private IEnumerator SmashCoroutine()
@@ -154,7 +111,6 @@ public class Block : MonoBehaviour
     private IEnumerator HoldCoroutine()
     {
         GameManager.Instance.currentState = GameState.Wait;
-        gameObject.tag = "Untagged";
         enabled = false;
         transform.rotation = Quaternion.identity;
         MoveTo(_holdArea.position);
@@ -166,7 +122,6 @@ public class Block : MonoBehaviour
         } else {
             _heldBlock.TryGetComponent(out Block tempBlock);
             {
-                tempBlock.tag = "OnBoardBlock";
                 tempBlock.enabled = true;
             }
             _heldBlock.transform.position = _spawnPoint.position;
@@ -187,7 +142,7 @@ public class Block : MonoBehaviour
                 continue;
             var xIndex = (int)child.position.x;
             var yIndex = (int)child.position.y;
-            Board[GetIndexOnBoardTiles(xIndex, yIndex)] = child;
+            ShadowBoard[GetIndexOnBoardTiles(xIndex, yIndex)] = child;
             if (minY > yIndex) minY = yIndex;
             if (maxY < yIndex) maxY = yIndex;
         }
@@ -219,7 +174,7 @@ public class Block : MonoBehaviour
     {
         for (int column = LeftLimit; column < RightLimit - LeftLimit; column++)
         {
-            if (!Board[GetIndexOnBoardTiles(column, y)])
+            if (!ShadowBoard[GetIndexOnBoardTiles(column, y)])
                 return false;
         }
         return true;
@@ -229,8 +184,8 @@ public class Block : MonoBehaviour
     {
         for (int x = 0; x < RightLimit; x++)
         {
-            Destroy(Board[GetIndexOnBoardTiles(x, y)].gameObject);
-            Board[GetIndexOnBoardTiles(x, y)] = null;
+            Destroy(ShadowBoard[GetIndexOnBoardTiles(x, y)].gameObject);
+            ShadowBoard[GetIndexOnBoardTiles(x, y)] = null;
         }
     }
 
@@ -240,11 +195,11 @@ public class Block : MonoBehaviour
         {
             for (int x = LeftLimit; x < RightLimit - LeftLimit; x++)
             {
-                if(Board[GetIndexOnBoardTiles(x, y)])
+                if(ShadowBoard[GetIndexOnBoardTiles(x, y)])
                 {
-                    Board[GetIndexOnBoardTiles(x, y - 1)] = Board[GetIndexOnBoardTiles(x, y)];
-                    Board[GetIndexOnBoardTiles(x, y)] = null;
-                    Board[GetIndexOnBoardTiles(x, y - 1)].position += Vector3.down;
+                    ShadowBoard[GetIndexOnBoardTiles(x, y - 1)] = ShadowBoard[GetIndexOnBoardTiles(x, y)];
+                    ShadowBoard[GetIndexOnBoardTiles(x, y)] = null;
+                    ShadowBoard[GetIndexOnBoardTiles(x, y - 1)].position += Vector3.down;
                 }
             }
         }
@@ -263,7 +218,7 @@ public class Block : MonoBehaviour
 
             int xIndex = (int)child.position.x;
             int yIndex = (int)child.position.y;
-            if(Board[GetIndexOnBoardTiles(xIndex, yIndex)]) 
+            if(ShadowBoard[GetIndexOnBoardTiles(xIndex, yIndex)]) 
                 return false;
         }
         return true;

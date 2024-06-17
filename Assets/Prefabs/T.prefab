@@ -84,6 +84,8 @@ MonoBehaviour:
   type: 5
   rotationPoint: {fileID: 5060935851293931440}
   centerPoint: {fileID: 5001763032788978998}
+  shadowMaterial: {fileID: 0}
+  tilePrefab: {fileID: 0}
 --- !u!114 &-3124785885417586235
 MonoBehaviour:
   m_ObjectHideFlags: 0
