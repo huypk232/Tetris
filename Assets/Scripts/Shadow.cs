@@ -3,12 +3,12 @@ using UnityEngine;
 
 public class Shadow : MonoBehaviour
 {
-    [SerializeField] private BlockType type;
     [SerializeField] private Transform rotationPoint;
     [SerializeField] private Transform centerPoint;
     [SerializeField] private Material shadowMaterial;
     [SerializeField] private GameObject shadowTilePrefab;
-    
+    [SerializeField] private Transform[] board;
+
     private const int LeftLimit = 0;
     private const int RightLimit = 10;
     private const int BottomLimit = 0;
@@ -16,9 +16,9 @@ public class Shadow : MonoBehaviour
     private const float FallTime = 1f;
     private float _deltaFallTime;
 
-    private static readonly Transform[] ShadowBoard = new Transform[(RightLimit - LeftLimit) * (TopLimit - BottomLimit)]; // use 1 dimension array to optimize speed
-    private static GameObject _heldBlock;
-    private static bool _holdInTurn;
+    // private readonly Transform[] board = new Transform[(RightLimit - LeftLimit) * (TopLimit - BottomLimit)]; // use 1 dimension array to optimize speed
+    private GameObject _heldBlock;
+    private bool _holdInTurn;
 
     private Transform _holdArea;
     private Transform _spawnPoint;
@@ -142,7 +142,7 @@ public class Shadow : MonoBehaviour
                 continue;
             var xIndex = (int)child.position.x;
             var yIndex = (int)child.position.y;
-            ShadowBoard[GetIndexOnBoardTiles(xIndex, yIndex)] = child;
+            board[GetIndexOnBoardTiles(xIndex, yIndex)] = child;
             if (minY > yIndex) minY = yIndex;
             if (maxY < yIndex) maxY = yIndex;
         }
@@ -170,36 +170,36 @@ public class Shadow : MonoBehaviour
         return false;
     }
 
-    private static bool IsFullRow(int y)
+    private bool IsFullRow(int y)
     {
         for (int column = LeftLimit; column < RightLimit - LeftLimit; column++)
         {
-            if (!ShadowBoard[GetIndexOnBoardTiles(column, y)])
+            if (!board[GetIndexOnBoardTiles(column, y)])
                 return false;
         }
         return true;
     }
 
-    private static void DeleteFullRow(int y)
+    private void DeleteFullRow(int y)
     {
         for (int x = 0; x < RightLimit; x++)
         {
-            Destroy(ShadowBoard[GetIndexOnBoardTiles(x, y)].gameObject);
-            ShadowBoard[GetIndexOnBoardTiles(x, y)] = null;
+            Destroy(board[GetIndexOnBoardTiles(x, y)].gameObject);
+            board[GetIndexOnBoardTiles(x, y)] = null;
         }
     }
 
-    private static void RowDown(int i)
+    private void RowDown(int i)
     {
         for (int y = i; y < TopLimit; y++)
         {
             for (int x = LeftLimit; x < RightLimit - LeftLimit; x++)
             {
-                if(ShadowBoard[GetIndexOnBoardTiles(x, y)])
+                if(board[GetIndexOnBoardTiles(x, y)])
                 {
-                    ShadowBoard[GetIndexOnBoardTiles(x, y - 1)] = ShadowBoard[GetIndexOnBoardTiles(x, y)];
-                    ShadowBoard[GetIndexOnBoardTiles(x, y)] = null;
-                    ShadowBoard[GetIndexOnBoardTiles(x, y - 1)].position += Vector3.down;
+                    board[GetIndexOnBoardTiles(x, y - 1)] = board[GetIndexOnBoardTiles(x, y)];
+                    board[GetIndexOnBoardTiles(x, y)] = null;
+                    board[GetIndexOnBoardTiles(x, y - 1)].position += Vector3.down;
                 }
             }
         }
@@ -218,13 +218,13 @@ public class Shadow : MonoBehaviour
 
             int xIndex = (int)child.position.x;
             int yIndex = (int)child.position.y;
-            if(ShadowBoard[GetIndexOnBoardTiles(xIndex, yIndex)]) 
+            if(board[GetIndexOnBoardTiles(xIndex, yIndex)]) 
                 return false;
         }
         return true;
     }
 
-    private static int GetIndexOnBoardTiles(int column, int row)
+    private int GetIndexOnBoardTiles(int column, int row)
     {
         return row * (RightLimit - LeftLimit) + column;
     }
