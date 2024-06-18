@@ -17,9 +17,8 @@ public class Spawner : MonoBehaviour
     private GameObject _holdBlock;
     private int[] _spawnCounter = new int[TotalBlocks];
     private int _remainBlockInCycle;
-    private Board board { get; set; }
-
-
+    [SerializeField] private Board board;
+    
     void Start()
     {
         InitSpawnCounter();
@@ -30,8 +29,9 @@ public class Spawner : MonoBehaviour
         
         Block firstBlock = Instantiate(blocks[firstRandomIndex], transform.position, Quaternion.identity).GetComponent<Block>();
         firstBlock.tag = "OnBoardBlock";
+        firstBlock.board = board;
         // shadow.UpsertCurrentClone(ref firstBlock);
-        
+        board.ChangeActiveBlock(firstBlock);
         // Spawn block in next area
         while(_nextBlocks.Count < 5)
         {
@@ -72,6 +72,7 @@ public class Spawner : MonoBehaviour
         {
             if(board.ValidMovement(nextBlock)){
                 nextBlock.enabled = true;
+                nextBlock.board = board;
                 nextBlock.tag = "OnBoardBlock";
             } else {
                 _nextBlocks[0].transform.localPosition = oldPosition;

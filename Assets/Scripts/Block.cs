@@ -14,7 +14,6 @@ public class Block : MonoBehaviour
     public Vector3Int[] cells { get; private set; }
     
     
-    private const float FallTime = 1f;
     private float _deltaFallTime;
 
     // private static readonly Transform[] Board = new Transform[(RightLimit - LeftLimit) * (TopLimit - BottomLimit)]; // use 1 dimension array to optimize speed
@@ -25,52 +24,61 @@ public class Block : MonoBehaviour
     private Transform _spawnPoint;
     private Spawner _spawner;
 
-    private Board board { get; set; }
-    private float stepTime;
-    private float stepDelay = 1f;
-    private float moveDelay = 0.1f;
-    private float lockDelay = 0.5f;
-    private float moveTime;
-    private float lockTime;
-    private Vector2Int[] childs;
+    public Board board { get; set; }
+    [SerializeField] private float stepDelay = 1f;
+    [SerializeField] private float moveDelay = 0.1f;
+    [SerializeField] private float lockDelay = 0.5f;
     
-    [Tooltip("Offset center to modify when rendering")]
+    private float stepTime;
+    private float _moveTime;
+    private float lockTime;
 
     private void Start()
     {
         _holdArea = GameObject.Find("/HoldArea/Hold").transform;
         _spawnPoint = GameObject.Find("/Spawner").transform;
         _spawner = FindObjectOfType<Spawner>();
-        _deltaFallTime = FallTime;
+        _deltaFallTime = stepTime;
+
+        stepTime = Time.time;
+        _moveTime = Time.time;
+        lockTime = Time.time;
     }
     
-    public void Initialize(Board board, Vector3Int position, TetrominoData data)
-    {
-        this.data = data;
-        this.board = board;
-        // this.position = position;
-        transform.position = position;
-
-        // rotationIndex = 0;
-        stepTime = Time.time + stepDelay;
-        moveTime = Time.time + moveDelay;
-        lockTime = 0f;
-
-        if (childs == null) {
-            childs = new Vector2Int[BlockData.Childs.Count];
-        }
-
-        for (int i = 0; i < childs.Length; i++) {
-            childs[i] = BlockData.Childs[type][i];
-        }
-    }
+    // public void Initialize(Board board, Vector3Int position, TetrominoData data)
+    // {
+    //     this.data = data;
+    //     this.board = board;
+    //     // this.position = position;
+    //     transform.position = position;
+    //
+    //     // rotationIndex = 0;
+    //     stepTime = Time.time + stepDelay;
+    //     moveTime = Time.time + moveDelay;
+    //     lockTime = 0f;
+    //
+    //     if (childs == null) {
+    //         childs = new Vector2Int[BlockData.Childs.Count];
+    //     }
+    //
+    //     for (int i = 0; i < childs.Length; i++) {
+    //         childs[i] = BlockData.Childs[type][i];
+    //     }
+    // }
 
     private void Update()
     {
         if (GameManager.Instance.currentState == GameState.Move)
         {
-            HandleMoveInput();
-            HoldAndFall();
+            if (Time.time > _moveTime)
+            {
+                HandleMoveInputs();
+            }
+
+            Hold();
+            Smash();
+            Drop();
+            // HoldAndFall();
             // Hold();
         }
     }
@@ -79,84 +87,131 @@ public class Block : MonoBehaviour
     public void MoveTo(Vector3 des)
     {
         transform.position = des;
-        transform.position += des - centerPoint.position;
+        // transform.position += des - centerPoint.position;
     }
 
-    private void HandleMoveInput()
+    private void HandleMoveInputs()
     {
         if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow))
         {
-            if (Move(Vector2Int.left))
+            Debug.Log(Time.time);
+            if (Movable(Vector2Int.left))
             {
-                stepTime = Time.time + stepTime;
+                _moveTime = Time.time + moveDelay;
+                MoveTo(transform.position);
+                board.AddToBoard(this);
             }
         }
 
         if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow))
         {
-            if (Move(Vector2Int.right))
+            if (Movable(Vector2Int.right))
             {
-                stepTime = Time.time + stepTime;
+                _moveTime = Time.time + moveDelay;
+                MoveTo(transform.position);
+                board.AddToBoard(this);
             }
         }
         
         if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow))
         {
-            if (Move(Vector2Int.right))
+            if (Rotatable(-90))
             {
-                stepTime = Time.time + stepTime;
+                // stepTime = Time.time + stepTime;
             }
         }
         
         if (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow))
         {
-            if (Move(Vector2Int.down))
+            if (Movable(Vector2Int.down))
             {
                 stepTime = Time.time + stepTime;
+                
             }
         }
         
     }
     
-    private bool Move(Vector2Int translation)
+    private bool Movable(Vector2Int translation)
     {
-        
-        // if(Input.GetKeyDown(KeyCode.LeftArrow))
-        // {
-        //     transform.position += Vector3.left;
-        //     if(!ValidMovement()) transform.position += Vector3.right;
-        // } else if (Input.GetKeyDown(KeyCode.RightArrow))
-        // {
-        //     transform.position += Vector3.right;
-        //     if(!ValidMovement()) transform.position += Vector3.left;
-        // }
-        //
-        // if(Input.GetKeyDown(KeyCode.UpArrow))
-        // {
-        //     transform.RotateAround(rotationPoint.position, new Vector3(0, 0, 1), -90);
-        //     if(!ValidMovement()) 
-        //         transform.RotateAround(rotationPoint.position, new Vector3(0, 0, 1), 90);
-        //
-        // }  
-        return false;
+        var simulateBlock = board.activePiece;
+        simulateBlock.transform.position += new Vector3(translation.x, translation.y, 0);
+        if (!board.ValidMovement(simulateBlock))
+            return false;
+        return true;
     }
     
-    private bool Rotate(int rotateAngle)
+    private bool Rotatable(int rotateAngle)
     {
         var simulateBlock = this;
         simulateBlock.transform.RotateAround(rotationPoint.position, new Vector3(0, 0, 1), rotateAngle);
-        if (board.ValidMovement(simulateBlock))
+        if (!board.ValidMovement(simulateBlock))
         {
-            transform.RotateAround(rotationPoint.position, new Vector3(0, 0, 1), rotateAngle);
-            return true;
+            return false;
         }
             
-        return false;
+        return true;
     }
 
+    private void Hold()
+    {
+        if(Input.GetKey(KeyCode.C)) {
+            if(!_holdInTurn)
+            {
+                StartCoroutine(HoldCoroutine());
+            }
+        }
+    }
+
+    private void Smash()
+    {
+        if (Input.GetKey(KeyCode.Space))
+        {
+            StartCoroutine(SmashCoroutine());
+            board.AddToBoard(this);
+            if (board.IsFullCols())
+            {
+                enabled = false;
+                GameManager.Instance.GameOver();
+                return;
+            }
+
+            gameObject.tag = "Untagged";
+            enabled = false;
+            _spawner.Spawn();
+            _holdInTurn = false; // refactor
+            GameManager.Instance.currentState = GameState.Move;
+        }
+    }
+
+    private void Drop()
+    {
+        if (Time.time > stepTime)
+        {
+            var simulateBlock = this;
+            simulateBlock.transform.position += Vector3.down;
+            if(!board.ValidMovement(simulateBlock)) 
+            {
+                // transform.position += Vector3.up;
+                board.AddToBoard(this);
+                if(board.IsFullCols()){
+                    gameObject.tag = "Untagged";
+                    enabled = false;
+                    GameManager.Instance.GameOver();
+                    return;
+                }
+                gameObject.tag = "Untagged";
+                enabled = false;
+                _spawner.Spawn();
+                _holdInTurn = false; // refactor
+            }
+            stepTime = Time.time + stepDelay;
+        }
+    }
+    
     private void HoldAndFall()
     {
-        if(Input.GetKeyDown(KeyCode.Space))
+        if(Input.GetKey(KeyCode.Space))
         {
             StartCoroutine(SmashCoroutine());
             board.AddToBoard(this);
@@ -171,40 +226,48 @@ public class Block : MonoBehaviour
             _spawner.Spawn();
             _holdInTurn = false; // refactor
             GameManager.Instance.currentState = GameState.Move;
-        } else if(Input.GetKeyDown(KeyCode.C)) {
+        } else if(Input.GetKey(KeyCode.C)) {
             if(!_holdInTurn)
             {
                 StartCoroutine(HoldCoroutine());
             }
         } else {
             
-            if(_deltaFallTime > 0.0f)
-            {
-                if(Input.GetKey(KeyCode.DownArrow))
+            // if(Time.time > stepTime)
+            // {
+                if(Input.GetKey(KeyCode.DownArrow) || Input.GetKey(KeyCode.S))
                 {
-                    _deltaFallTime -= 20 * Time.deltaTime;
-                } else {
-                    _deltaFallTime -= Time.deltaTime;
+                    stepTime = Time.time + stepDelay;
                 }
-            } else {
-                transform.position += Vector3.down;
-                // if(!ValidMovement()) 
-                // {
-                //     transform.position += Vector3.up;
-                //     AddToBoard();
-                //     if(IsFullCols()){
-                //         gameObject.tag = "Untagged";
-                //         enabled = false;
-                //         GameManager.Instance.GameOver();
-                //         return;
-                //     }
-                //     gameObject.tag = "Untagged";
-                //     enabled = false;
-                //     _spawner.Spawn();
-                //     _holdInTurn = false; // refactor
+                // else {
+                //     stepTime = Time.time + stepDelay;
+                //     _deltaFallTime -= Time.deltaTime;
                 // }
-                _deltaFallTime = FallTime;
-            }   
+            // } else {
+            if (Time.time > stepTime)
+            {
+                var simulateBlock = this;
+                simulateBlock.transform.position += Vector3.down;
+                if(!board.ValidMovement(simulateBlock)) 
+                {
+                    // transform.position += Vector3.up;
+                    board.AddToBoard(this);
+                    if(board.IsFullCols()){
+                        gameObject.tag = "Untagged";
+                        enabled = false;
+                        GameManager.Instance.GameOver();
+                        return;
+                    }
+                    gameObject.tag = "Untagged";
+                    enabled = false;
+                    _spawner.Spawn();
+                    _holdInTurn = false; // refactor
+                }
+                stepTime = Time.time + stepDelay;
+            }
+                // transform.position += Vector3.down;
+               
+            // }   
         } 
         
     }
@@ -212,7 +275,7 @@ public class Block : MonoBehaviour
     private IEnumerator SmashCoroutine()
     {
         GameManager.Instance.currentState = GameState.Wait;
-        while(Move(Vector2Int.down))
+        while(Movable(Vector2Int.down))
         {
             // transform.position += Vector3.down;
         }

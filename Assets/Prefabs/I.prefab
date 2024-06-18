@@ -86,6 +86,10 @@ MonoBehaviour:
   centerPoint: {fileID: 7057078642308529508}
   shadowMaterial: {fileID: 0}
   tilePrefab: {fileID: 0}
+  shadow: {fileID: 0}
+  stepDelay: 1
+  moveDelay: 0.1
+  lockDelay: 0.5
 --- !u!114 &-893533691730542664
 MonoBehaviour:
   m_ObjectHideFlags: 0

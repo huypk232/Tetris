@@ -5,88 +5,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b445b5d3-8126-4436-b751-86bea11f2995" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/.idea.Tetris/.idea/indexLayout.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/.idea.Tetris/.idea/projectSettingsUpdater.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/.idea.Tetris/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/.idea.Tetris/.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Data.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Data/Tetromino.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Data/Tetromino.cs.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/BlockData.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/BlockData.cs.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Board.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Board.cs.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/TetrominoType.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/TetrominoType.cs.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Sprites/Tetrominoes.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Sprites/Tetrominoes/I.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Sprites/Tetrominoes/I.png.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Sprites/Tetrominoes/J.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Sprites/Tetrominoes/J.png.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Sprites/Tetrominoes/L.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Sprites/Tetrominoes/L.png.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Sprites/Tetrominoes/O.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Sprites/Tetrominoes/O.png.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Sprites/Tetrominoes/S.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Sprites/Tetrominoes/S.png.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Sprites/Tetrominoes/T.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Sprites/Tetrominoes/T.png.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Sprites/Tetrominoes/Tiles.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Sprites/Tetrominoes/Tiles/Blocks.prefab" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Sprites/Tetrominoes/Tiles/Blocks.prefab.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Sprites/Tetrominoes/Tiles/Blue.asset" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Sprites/Tetrominoes/Tiles/Blue.asset.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Sprites/Tetrominoes/Tiles/Cyan.asset" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Sprites/Tetrominoes/Tiles/Cyan.asset.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Sprites/Tetrominoes/Tiles/Ghost.asset" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Sprites/Tetrominoes/Tiles/Ghost.asset.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Sprites/Tetrominoes/Tiles/Green.asset" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Sprites/Tetrominoes/Tiles/Green.asset.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Sprites/Tetrominoes/Tiles/I_Tile.asset" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Sprites/Tetrominoes/Tiles/I_Tile.asset.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Sprites/Tetrominoes/Tiles/J_Tile.asset" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Sprites/Tetrominoes/Tiles/J_Tile.asset.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Sprites/Tetrominoes/Tiles/L_Tile.asset" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Sprites/Tetrominoes/Tiles/L_Tile.asset.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Sprites/Tetrominoes/Tiles/New Animated Tile.asset" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Sprites/Tetrominoes/Tiles/New Animated Tile.asset.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Sprites/Tetrominoes/Tiles/O_Tile.asset" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Sprites/Tetrominoes/Tiles/O_Tile.asset.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Sprites/Tetrominoes/Tiles/Orange.asset" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Sprites/Tetrominoes/Tiles/Orange.asset.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Sprites/Tetrominoes/Tiles/Purple.asset" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Sprites/Tetrominoes/Tiles/Purple.asset.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Sprites/Tetrominoes/Tiles/Red.asset" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Sprites/Tetrominoes/Tiles/Red.asset.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Sprites/Tetrominoes/Tiles/S_Tile.asset" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Sprites/Tetrominoes/Tiles/S_Tile.asset.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Sprites/Tetrominoes/Tiles/T_Tile.asset" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Sprites/Tetrominoes/Tiles/T_Tile.asset.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Sprites/Tetrominoes/Tiles/Yellow.asset" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Sprites/Tetrominoes/Tiles/Yellow.asset.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Sprites/Tetrominoes/Tiles/Z_Tile.asset" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Sprites/Tetrominoes/Tiles/Z_Tile.asset.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Sprites/Tetrominoes/Z.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Sprites/Tetrominoes/Z.png.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/mono_crash.mem.59127.1.blob" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Tetris/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Tetris/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Prefabs/I.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Prefabs/I.prefab" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scenes/Game.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/Game.unity" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scripts/Block.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Block.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Shadow.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Shadow.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Board.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Board.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scripts/Spawner.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Spawner.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Sprites/I.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Sprites/I.png.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Sprites/J.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Sprites/J.png.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Sprites/L.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Sprites/L.png.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Sprites/O.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Sprites/O.png.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Sprites/S.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Sprites/S.png.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Sprites/T.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Sprites/T.png.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Sprites/Z.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Sprites/Z.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/TetrominoType.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Tetromino.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/TetrominoType.cs.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Tetromino.cs.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ProjectSettings/ProjectVersion.txt" beforeDir="false" afterPath="$PROJECT_DIR$/ProjectSettings/ProjectVersion.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -102,12 +29,7 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/b35d5de41daf438386183d6e0daec8eda200/16/300a36ef/Tilemap.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/b5afb0188cbe4644b4d617a8d89e605b175c00/23/ae00201a/Component.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/b5afb0188cbe4644b4d617a8d89e605b175c00/ad/7113de0e/Transform.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/7d303c2bf72cd4cec95665b89c457d265d2b8ef3ed6da17cd4f85587c2f9de7/System.Linq.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/d44b17e136d09081da1e8fd0e8c83fde60e11818b9f2442d7ed8cb733fae895e/System.Collections.Generic.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///home/khanhuy/Documents/Project/Unity/Tetris/Assets/Scripts/Block.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/Tetromino.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.2d.tilemap@1.0.0/Editor/GridSelectionEditor.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="KubernetesApiPersistence">{}</component>
@@ -126,29 +48,29 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "feature/240617/add-block-shadow",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "CodeLensConfigurable",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;feature/240617/add-block-shadow&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;CodeLensConfigurable&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
-  "keyToStringList": {
-    "rider.external.source.directories": [
-      "/home/khanhuy/.config/JetBrains/Rider2024.1/resharper-host/DecompilerCache",
-      "/home/khanhuy/.config/JetBrains/Rider2024.1/resharper-host/SourcesCache",
-      "/home/khanhuy/.local/share/Symbols/src"
+  &quot;keyToStringList&quot;: {
+    &quot;rider.external.source.directories&quot;: [
+      &quot;C:\\Users\\huypk\\AppData\\Roaming\\JetBrains\\Rider2024.1\\resharper-host\\DecompilerCache&quot;,
+      &quot;C:\\Users\\huypk\\AppData\\Roaming\\JetBrains\\Rider2024.1\\resharper-host\\SourcesCache&quot;,
+      &quot;C:\\Users\\huypk\\AppData\\Local\\Symbols\\src&quot;
     ]
   }
-}]]></component>
+}</component>
   <component name="RunManager" selected="Attach to Unity Editor.Attach to Unity Editor">
     <configuration name="Start Unity" type="RunUnityExe" factoryName="Unity Executable">
-      <option name="EXE_PATH" value="$USER_HOME$/Unity/Hub/Editor/2022.3.30f1/Editor/Unity" />
+      <option name="EXE_PATH" value="C:\Program Files\Unity\Hub\Editor\2022.3.28f1\Editor\Unity.exe" />
       <option name="PROGRAM_PARAMETERS" value="-projectPath $PROJECT_DIR$ -debugCodeOptimization" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <option name="PASS_PARENT_ENVS" value="1" />
@@ -156,7 +78,7 @@
       <method v="2" />
     </configuration>
     <configuration name="Unit Tests (batch mode)" type="RunUnityExe" factoryName="Unity Executable">
-      <option name="EXE_PATH" value="$USER_HOME$/Unity/Hub/Editor/2022.3.30f1/Editor/Unity" />
+      <option name="EXE_PATH" value="C:\Program Files\Unity\Hub\Editor\2022.3.28f1\Editor\Unity.exe" />
       <option name="PROGRAM_PARAMETERS" value="-runTests -batchmode -projectPath $PROJECT_DIR$ -testResults Logs/results.xml -testPlatform EditMode -debugCodeOptimization" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <option name="PASS_PARENT_ENVS" value="1" />
@@ -205,6 +127,8 @@
       <workItem from="1718685830505" duration="404000" />
       <workItem from="1718686244259" duration="3438000" />
       <workItem from="1718692740684" duration="2166000" />
+      <workItem from="1718728304816" duration="7785000" />
+      <workItem from="1718741211240" duration="1264000" />
     </task>
     <task id="LOCAL-00001" summary="drafty">
       <option name="closed" value="true" />
@@ -294,6 +218,6 @@
     <MESSAGE value="add logic shadow" />
     <MESSAGE value="base new board design" />
     <MESSAGE value="save scene" />
-    <option name="LAST_COMMIT_MESSAGE" value="save scene" />
+    <option name="LAST_COMMIT_MESSAGE" value="" />
   </component>
 </project>
