@@ -11,12 +11,22 @@ public class Spawner : MonoBehaviour
 
     private const int TotalBlocks = 7;
     
-    private List<GameObject> _nextBlocks = new List<GameObject>();
+    private readonly List<GameObject> _nextBlocks = new();
     private GameObject _holdBlock;
-    private int[] _spawnCounter = new int[TotalBlocks];
+    private Shadow _shadow;
+    private readonly int[] _spawnCounter = new int[TotalBlocks];
     private int _remainBlockInCycle;
 
-    void Start()
+    
+    [SerializeField] private Board board;
+    
+    
+    private void Awake()
+    {
+        _shadow = FindObjectOfType<Shadow>();
+    }
+
+    private void Start()
     {
         InitSpawnCounter();
         
@@ -24,8 +34,10 @@ public class Spawner : MonoBehaviour
         _spawnCounter[firstRandomIndex]--;
         _remainBlockInCycle--;
         
-        Instantiate(blocks[firstRandomIndex], transform.position, Quaternion.identity);
-
+        Block firstBlock = Instantiate(blocks[firstRandomIndex], transform.position, Quaternion.identity).GetComponent<Block>();
+        firstBlock.SetBoard(board);
+        _shadow.SetFollowBlock(firstBlock, transform.position);
+        
         // Spawn block in next area
         while(_nextBlocks.Count < 5)
         {
@@ -64,8 +76,10 @@ public class Spawner : MonoBehaviour
         _nextBlocks[0].transform.position = transform.position;
         if( _nextBlocks[0].TryGetComponent(out Block nextBlock))
         {
-            if(nextBlock.ValidMovement()){
+            if(board.ValidMovement(nextBlock)){
                 nextBlock.enabled = true;
+                nextBlock.SetBoard(board);
+                _shadow.SetFollowBlock(nextBlock, transform.position);
             } else {
                 _nextBlocks[0].transform.localPosition = oldPosition;
                 GameManager.Instance.GameOver();

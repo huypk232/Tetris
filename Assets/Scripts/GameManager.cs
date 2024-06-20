@@ -14,6 +14,8 @@ public class GameManager : MonoBehaviour
     public GameObject gameOverCanvas;
     public GameObject inGameCanvas;
     public GameState currentState = GameState.Move;
+    private Spawner _spawner;
+    private Shadow _shadow;
 
     void Awake()
     {
@@ -21,6 +23,8 @@ public class GameManager : MonoBehaviour
         {
             Instance = this;
         }
+        _spawner = FindObjectOfType<Spawner>();
+        _shadow = FindObjectOfType<Shadow>();
         // currentScore = 0;
         // LoadScore();
         Time.timeScale = 1f;
@@ -35,11 +39,8 @@ public class GameManager : MonoBehaviour
     public void GameOver()
     {
         Time.timeScale = 0f;
-        var spawnerGo = FindObjectOfType<Spawner>();
-        if(spawnerGo.TryGetComponent<Spawner>(out var spawner))
-        {
-            spawner.enabled = false;
-        }
+        _spawner.enabled = false;
+        _shadow.gameObject.SetActive(false);
         gameOverCanvas.SetActive(true);
 
     }
