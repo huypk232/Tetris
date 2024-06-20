@@ -7,14 +7,13 @@ public class Shadow : MonoBehaviour
 
     [SerializeField] private GameObject tilePrefab;
     
-    private Block _followBlock;
     private Transform _rotationPoint;
-    private Vector3 _spawnerPosition;
+    private Vector3 _followBlockHeight;
 
-    public void Follow(Block block, Vector3 spawnerPosition)
+    public void Follow(Block block)
     {
         _rotationPoint = null;
-        _spawnerPosition = spawnerPosition;
+        _followBlockHeight = block.transform.position + Vector3.down;
         ToOriginal();
         Copy(block);
     }
@@ -25,9 +24,13 @@ public class Shadow : MonoBehaviour
             Move();
     }
 
+    public void SetFollowBlockHeight(Vector3 pos)
+    {
+        _followBlockHeight = pos + Vector3.down;
+    }
+    
     private void Copy(Block block)
     {
-        _followBlock = block;
         transform.position = block.transform.position;
         _rotationPoint = block.GetRotationPoint();
         var isValidRotationPoint = false;
@@ -64,18 +67,18 @@ public class Shadow : MonoBehaviour
         if(Input.GetKeyDown(KeyCode.LeftArrow))
         {
             transform.position += Vector3.left;
-            transform.position = new Vector3(transform.position.x, _spawnerPosition.y, transform.position.z);
+            transform.position = new Vector3(transform.position.x, _followBlockHeight.y, transform.position.z);
             if(!ValidMovement()) transform.position += Vector3.right;
         } else if (Input.GetKeyDown(KeyCode.RightArrow))
         {
             transform.position += Vector3.right;
-            transform.position = new Vector3(transform.position.x, _spawnerPosition.y, transform.position.z);
+            transform.position = new Vector3(transform.position.x, _followBlockHeight.y, transform.position.z);
             if(!ValidMovement()) transform.position += Vector3.left;
         }
 
         if(Input.GetKeyDown(KeyCode.UpArrow) && _rotationPoint)
         {
-            transform.position = new Vector3(transform.position.x, _spawnerPosition.y, transform.position.z);
+            transform.position = new Vector3(transform.position.x, _followBlockHeight.y, transform.position.z);
             transform.RotateAround(_rotationPoint.position, new Vector3(0, 0, 1), -90);
             if (!ValidMovement())
             {
@@ -109,8 +112,8 @@ public class Shadow : MonoBehaviour
                 return false;
             }
 
-            int xIndex = (int)child.position.x;
-            int yIndex = (int)child.position.y;
+            var xIndex = (int)child.position.x;
+            var yIndex = (int)child.position.y;
             if (board.Tiles[GetIndexOnBoardTiles(xIndex, yIndex)])
             {
                 return false;

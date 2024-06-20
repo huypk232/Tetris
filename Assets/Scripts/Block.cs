@@ -36,7 +36,7 @@ public class Block : MonoBehaviour
         _spawner = FindObjectOfType<Spawner>();
         _deltaFallTime = FallTime;
         _shadow = FindObjectOfType<Shadow>();
-        _shadow.Follow(this, _spawner.transform.position);
+        _shadow.Follow(this);
     }
 
     private void Update()
@@ -45,6 +45,7 @@ public class Block : MonoBehaviour
         {
             Move();
             HoldAndFall();
+            _shadow.SetFollowBlockHeight(transform.position);
         }
     }
 
@@ -67,28 +68,23 @@ public class Block : MonoBehaviour
 
     private void Move()
     {
-        var hasMove = false;
         if(Input.GetKeyDown(KeyCode.LeftArrow))
-        {
-            hasMove = true;            
+        {            
             transform.position += Vector3.left;
             if(!_board.ValidMovement(this)) transform.position += Vector3.right;
         } else if (Input.GetKeyDown(KeyCode.RightArrow))
-        {
-            hasMove = true;            
+        {            
             transform.position += Vector3.right;
             if(!_board.ValidMovement(this)) transform.position += Vector3.left;
         }
 
         if(Input.GetKeyDown(KeyCode.UpArrow))
-        {
-            hasMove = true;            
+        {   
             transform.RotateAround(rotationPoint.position, new Vector3(0, 0, 1), -90);
             if(!_board.ValidMovement(this)) 
                 transform.RotateAround(rotationPoint.position, new Vector3(0, 0, 1), 90);
 
         }  
-        if (hasMove) _shadow.Follow(this, _spawner.transform.position);
     }
 
     private void HoldAndFall()
@@ -137,7 +133,6 @@ public class Block : MonoBehaviour
                     _spawner.Spawn();
                     _holdInTurn = false; // refactor
                 }
-                _shadow.Follow(this, _spawner.transform.position);
                 _deltaFallTime = FallTime;
             }   
         } 
@@ -172,7 +167,7 @@ public class Block : MonoBehaviour
             _heldBlock.TryGetComponent(out Block tempBlock);
             {
                 tempBlock.enabled = true;
-                _shadow.Follow(tempBlock, _spawner.transform.position);
+                _shadow.Follow(tempBlock);
             }
             _heldBlock = transform.gameObject;
         }

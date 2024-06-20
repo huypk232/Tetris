@@ -96,8 +96,8 @@ public class Board : MonoBehaviour
                 return false;
             }
 
-            int xIndex = (int)child.position.x;
-            int yIndex = (int)child.position.y;
+            var xIndex = (int)child.position.x;
+            var yIndex = (int)child.position.y;
             if(Tiles[GetIndexOnBoardTiles(xIndex, yIndex)]) 
                 return false;
         }

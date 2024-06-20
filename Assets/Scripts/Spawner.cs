@@ -36,7 +36,7 @@ public class Spawner : MonoBehaviour
         
         Block firstBlock = Instantiate(blocks[firstRandomIndex], transform.position, Quaternion.identity).GetComponent<Block>();
         firstBlock.SetBoard(board);
-        _shadow.Follow(firstBlock, transform.position);
+        _shadow.Follow(firstBlock);
         
         while(_nextBlocks.Count < 5)
         {
@@ -78,7 +78,7 @@ public class Spawner : MonoBehaviour
             if(board.ValidMovement(nextBlock)){
                 nextBlock.enabled = true;
                 nextBlock.SetBoard(board);
-                _shadow.Follow(nextBlock, transform.position);
+                _shadow.Follow(nextBlock);
             } else {
                 _nextBlocks[0].transform.localPosition = oldPosition;
                 GameManager.Instance.GameOver();
