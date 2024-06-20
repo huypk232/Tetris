@@ -11,8 +11,9 @@ public class Shadow : MonoBehaviour
     private Transform _rotationPoint;
     private Vector3 _spawnerPosition;
 
-    public void SetFollowBlock(Block block, Vector3 spawnerPosition)
+    public void Follow(Block block, Vector3 spawnerPosition)
     {
+        _rotationPoint = null;
         _spawnerPosition = spawnerPosition;
         ToOriginal();
         Copy(block);
@@ -29,16 +30,21 @@ public class Shadow : MonoBehaviour
         _followBlock = block;
         transform.position = block.transform.position;
         _rotationPoint = block.GetRotationPoint();
+        var isValidRotationPoint = false;
         foreach (Transform child in block.gameObject.transform)
         {
             if (!child.gameObject.CompareTag("CenterPoint"))
             {
                 var shadowTile = Instantiate(tilePrefab, child.transform.position, Quaternion.identity, transform);
                 if (_rotationPoint.position == child.position)
+                {
                     _rotationPoint = shadowTile.transform;
+                    isValidRotationPoint = true;
+                }
             }
         }
 
+        if (!isValidRotationPoint) _rotationPoint = null;
         StartCoroutine(SmashCoroutine());
     }
 
@@ -52,12 +58,6 @@ public class Shadow : MonoBehaviour
 
         }
     }
-
-    public void RePosition()
-    {
-        transform.position = _followBlock.transform.position;
-        StartCoroutine(SmashCoroutine());
-    }
     
     private void Move()
     {
@@ -66,13 +66,11 @@ public class Shadow : MonoBehaviour
             transform.position += Vector3.left;
             transform.position = new Vector3(transform.position.x, _spawnerPosition.y, transform.position.z);
             if(!ValidMovement()) transform.position += Vector3.right;
-            // StartCoroutine(SmashCoroutine());
         } else if (Input.GetKeyDown(KeyCode.RightArrow))
         {
             transform.position += Vector3.right;
             transform.position = new Vector3(transform.position.x, _spawnerPosition.y, transform.position.z);
             if(!ValidMovement()) transform.position += Vector3.left;
-            // StartCoroutine(SmashCoroutine());
         }
 
         if(Input.GetKeyDown(KeyCode.UpArrow) && _rotationPoint)
@@ -83,9 +81,9 @@ public class Shadow : MonoBehaviour
             {
                 transform.RotateAround(_rotationPoint.position, new Vector3(0, 0, 1), 90);
             }
-            // StartCoroutine(SmashCoroutine());
         }
         Smash();
+        // StartCoroutine(SmashCoroutine());
     }
 
     private IEnumerator SmashCoroutine()

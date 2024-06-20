@@ -16,13 +16,9 @@ public class Block : MonoBehaviour
     [SerializeField] private BlockType type;
     [SerializeField] private Transform rotationPoint;
     [SerializeField] private Transform centerPoint;
-    [SerializeField] private Material shadowMaterial;
-    [SerializeField] private Material tilePrefab;
-    
     
     private const float FallTime = 1f;
     private float _deltaFallTime;
-
     
     private static GameObject _heldBlock;
     private static bool _holdInTurn;
@@ -31,8 +27,7 @@ public class Block : MonoBehaviour
     private Transform _holdArea;
     private Transform _spawnPoint;
     private Spawner _spawner;
-    
-    [Tooltip("Offset center to modify when rendering")]
+    private Shadow _shadow;
 
     private void Start()
     {
@@ -40,6 +35,8 @@ public class Block : MonoBehaviour
         _spawnPoint = GameObject.Find("/Spawner").transform;
         _spawner = FindObjectOfType<Spawner>();
         _deltaFallTime = FallTime;
+        _shadow = FindObjectOfType<Shadow>();
+        _shadow.Follow(this, _spawner.transform.position);
     }
 
     private void Update()
@@ -48,7 +45,6 @@ public class Block : MonoBehaviour
         {
             Move();
             HoldAndFall();
-            // Hold();
         }
     }
 
@@ -71,23 +67,28 @@ public class Block : MonoBehaviour
 
     private void Move()
     {
+        var hasMove = false;
         if(Input.GetKeyDown(KeyCode.LeftArrow))
         {
+            hasMove = true;            
             transform.position += Vector3.left;
             if(!_board.ValidMovement(this)) transform.position += Vector3.right;
         } else if (Input.GetKeyDown(KeyCode.RightArrow))
         {
+            hasMove = true;            
             transform.position += Vector3.right;
             if(!_board.ValidMovement(this)) transform.position += Vector3.left;
         }
 
         if(Input.GetKeyDown(KeyCode.UpArrow))
         {
+            hasMove = true;            
             transform.RotateAround(rotationPoint.position, new Vector3(0, 0, 1), -90);
             if(!_board.ValidMovement(this)) 
                 transform.RotateAround(rotationPoint.position, new Vector3(0, 0, 1), 90);
 
         }  
+        if (hasMove) _shadow.Follow(this, _spawner.transform.position);
     }
 
     private void HoldAndFall()
@@ -136,6 +137,7 @@ public class Block : MonoBehaviour
                     _spawner.Spawn();
                     _holdInTurn = false; // refactor
                 }
+                _shadow.Follow(this, _spawner.transform.position);
                 _deltaFallTime = FallTime;
             }   
         } 
@@ -166,11 +168,12 @@ public class Block : MonoBehaviour
             _heldBlock = transform.gameObject;
             _spawner.Spawn();
         } else {
+            _heldBlock.transform.position = _spawnPoint.position;
             _heldBlock.TryGetComponent(out Block tempBlock);
             {
                 tempBlock.enabled = true;
+                _shadow.Follow(tempBlock, _spawner.transform.position);
             }
-            _heldBlock.transform.position = _spawnPoint.position;
             _heldBlock = transform.gameObject;
         }
         _holdInTurn = true;
