@@ -45,6 +45,7 @@ public class Shadow : MonoBehaviour
     private void ToOriginal()
     {
         transform.position = Vector3.zero;
+        _rotationPoint = null;
         foreach (Transform child in transform)
         {
             Destroy(child.gameObject);
@@ -74,7 +75,7 @@ public class Shadow : MonoBehaviour
             // StartCoroutine(SmashCoroutine());
         }
 
-        if(Input.GetKeyDown(KeyCode.UpArrow))
+        if(Input.GetKeyDown(KeyCode.UpArrow) && _rotationPoint)
         {
             transform.position = new Vector3(transform.position.x, _spawnerPosition.y, transform.position.z);
             transform.RotateAround(_rotationPoint.position, new Vector3(0, 0, 1), -90);
@@ -85,7 +86,6 @@ public class Shadow : MonoBehaviour
             // StartCoroutine(SmashCoroutine());
         }
         Smash();
-
     }
 
     private IEnumerator SmashCoroutine()
