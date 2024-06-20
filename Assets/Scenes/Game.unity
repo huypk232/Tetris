@@ -1434,6 +1434,7 @@ MonoBehaviour:
   - {fileID: 415555854}
   - {fileID: 20549351}
   holdArea: {fileID: 1761687360}
+  board: {fileID: 1688289848}
 --- !u!4 &829767556
 Transform:
   m_ObjectHideFlags: 0
@@ -2044,6 +2045,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1482010103}
+  - component: {fileID: 1482010104}
   m_Layer: 0
   m_Name: Shadow
   m_TagString: Untagged
@@ -2060,12 +2062,26 @@ Transform:
   m_GameObject: {fileID: 1482010102}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 6.038389, y: 8.642014, z: 0.46004558}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1482010104
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1482010102}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5a3bcb1712b044d894f5d0d0f67d8530, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  board: {fileID: 1688289848}
+  tilePrefab: {fileID: 8018854510930056836, guid: 9b8272785073faf4ba9f56eb849698d4, type: 3}
 --- !u!1 &1540160752
 GameObject:
   m_ObjectHideFlags: 0
@@ -2506,6 +2522,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1688289847}
   - component: {fileID: 1688289846}
+  - component: {fileID: 1688289848}
   m_Layer: 0
   m_Name: Board
   m_TagString: Untagged
@@ -2584,6 +2601,23 @@ Transform:
   - {fileID: 1974332681}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1688289848
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1688289845}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 265b9a868db64cac9d229e3ffe35eecc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  type: 0
+  rotationPoint: {fileID: 0}
+  centerPoint: {fileID: 0}
+  shadowMaterial: {fileID: 0}
+  tilePrefab: {fileID: 0}
 --- !u!1 &1761687359
 GameObject:
   m_ObjectHideFlags: 0
