@@ -1,7 +1,4 @@
-using System.Collections;
 using UnityEngine;
-
-
 
 public class Board : MonoBehaviour
 {
@@ -10,162 +7,22 @@ public class Board : MonoBehaviour
     [SerializeField] private Transform centerPoint;
     [SerializeField] private Material shadowMaterial;
     [SerializeField] private Material tilePrefab;
-    
-    public const int LeftLimit = 0;
-    public const int RightLimit = 10;
-    public const int BottomLimit = 0;
-    public const int TopLimit = 23;
-    private const float FallTime = 1f;
-    private float _deltaFallTime;
 
-    public readonly Transform[] _tiles = new Transform[(RightLimit - LeftLimit) * (TopLimit - BottomLimit)]; // use 1 dimension array to optimize speed
+    public readonly Transform[] Tiles = new Transform[(Constants.RightLimit - Constants.LeftLimit) * (Constants.TopLimit - Constants.BottomLimit)]; // use 1 dimension array to optimize speed
     private static GameObject _heldBlock;
     private static bool _holdInTurn;
-
-    private Transform _holdArea;
-    private Transform _spawnPoint;
-    private Spawner _spawner;
     
-    [Tooltip("Offset center to modify when rendering")]
-
-    private void Start()
-    {
-        _holdArea = GameObject.Find("/HoldArea/Hold").transform;
-        _spawnPoint = GameObject.Find("/Spawner").transform;
-        _spawner = FindObjectOfType<Spawner>();
-        _deltaFallTime = FallTime;
-    }
-
-    // private void Update()
-    // {
-    //     if (GameManager.Instance.currentState == GameState.Move)
-    //     {
-    //         Move();
-    //         HoldAndFall();
-    //         // Hold();
-    //     }
-    // }
-
-    // private void Move()
-    // {
-    //     if(Input.GetKeyDown(KeyCode.LeftArrow))
-    //     {
-    //         transform.position += Vector3.left;
-    //         if(!ValidMovement()) transform.position += Vector3.right;
-    //     } else if (Input.GetKeyDown(KeyCode.RightArrow))
-    //     {
-    //         transform.position += Vector3.right;
-    //         if(!ValidMovement()) transform.position += Vector3.left;
-    //     }
-    //
-    //     if(Input.GetKeyDown(KeyCode.UpArrow))
-    //     {
-    //         transform.RotateAround(rotationPoint.position, new Vector3(0, 0, 1), -90);
-    //         if(!ValidMovement()) 
-    //             transform.RotateAround(rotationPoint.position, new Vector3(0, 0, 1), 90);
-    //
-    //     }  
-    // }
-
-    // private void HoldAndFall()
-    // {
-    //     if(Input.GetKeyDown(KeyCode.Space))
-    //     {
-    //         StartCoroutine(SmashCoroutine());
-    //         AddToBoard();
-    //         if(IsFullCols())
-    //         {
-    //             enabled = false;
-    //             GameManager.Instance.GameOver();
-    //             return;
-    //         }
-    //         enabled = false;
-    //         _spawner.Spawn();
-    //         _holdInTurn = false; // refactor
-    //         GameManager.Instance.currentState = GameState.Move;
-    //     } else if(Input.GetKeyDown(KeyCode.C)) {
-    //         if(!_holdInTurn)
-    //         {
-    //             StartCoroutine(HoldCoroutine());
-    //         }
-    //     } else {
-    //         
-    //         if(_deltaFallTime > 0.0f)
-    //         {
-    //             if(Input.GetKey(KeyCode.DownArrow))
-    //             {
-    //                 _deltaFallTime -= 10 * Time.deltaTime;
-    //             } else {
-    //                 _deltaFallTime -= Time.deltaTime;
-    //             }
-    //         } else {
-    //             transform.position += Vector3.down;
-    //             if(!ValidMovement()) 
-    //             {
-    //                 transform.position += Vector3.up;
-    //                 AddToBoard();
-    //                 if(IsFullCols()){
-    //                     enabled = false;
-    //                     GameManager.Instance.GameOver();
-    //                     return;
-    //                 }
-    //                 enabled = false;
-    //                 _spawner.Spawn();
-    //                 _holdInTurn = false; // refactor
-    //             }
-    //             _deltaFallTime = FallTime;
-    //         }   
-    //     } 
-    //     
-    // }
-
-    // private IEnumerator SmashCoroutine()
-    // {
-    //     GameManager.Instance.currentState = GameState.Wait;
-    //     while(ValidMovement())
-    //     {
-    //         transform.position += Vector3.down;
-    //     }
-    //     transform.position += Vector3.up;
-    //     yield return new WaitForSeconds(0.1f);
-    //     GameManager.Instance.currentState = GameState.Move;
-    // }
-    //
-    // private IEnumerator HoldCoroutine()
-    // {
-    //     GameManager.Instance.currentState = GameState.Wait;
-    //     enabled = false;
-    //     transform.rotation = Quaternion.identity;
-    //     MoveTo(_holdArea.position);
-    //
-    //     if(!_heldBlock)
-    //     {
-    //         _heldBlock = transform.gameObject;
-    //         _spawner.Spawn();
-    //     } else {
-    //         _heldBlock.TryGetComponent(out Block tempBlock);
-    //         {
-    //             tempBlock.enabled = true;
-    //         }
-    //         _heldBlock.transform.position = _spawnPoint.position;
-    //         _heldBlock = transform.gameObject;
-    //     }
-    //     _holdInTurn = true;
-    //     yield return null;
-    //     GameManager.Instance.currentState = GameState.Move;
-    // }
-
     public void AddToBoard(Block block)
     {
-        var minY = TopLimit;
-        var maxY = BottomLimit;
+        var minY = Constants.TopLimit;
+        var maxY = Constants.BottomLimit;
         foreach (Transform child in block.gameObject.transform)
         {
             if(child.gameObject.CompareTag("CenterPoint")) 
                 continue;
             var xIndex = (int)child.position.x;
             var yIndex = (int)child.position.y;
-            _tiles[GetIndexOnBoardTiles(xIndex, yIndex)] = child;
+            Tiles[GetIndexOnBoardTiles(xIndex, yIndex)] = child;
             if (minY > yIndex) minY = yIndex;
             if (maxY < yIndex) maxY = yIndex;
         }
@@ -195,9 +52,9 @@ public class Board : MonoBehaviour
 
     private bool IsFullRow(int y)
     {
-        for (int column = LeftLimit; column < RightLimit - LeftLimit; column++)
+        for (int column = Constants.LeftLimit; column < Constants.RightLimit - Constants.LeftLimit; column++)
         {
-            if (!_tiles[GetIndexOnBoardTiles(column, y)])
+            if (!Tiles[GetIndexOnBoardTiles(column, y)])
                 return false;
         }
         return true;
@@ -205,24 +62,24 @@ public class Board : MonoBehaviour
 
     private void DeleteFullRow(int y)
     {
-        for (int x = 0; x < RightLimit; x++)
+        for (int x = 0; x < Constants.RightLimit; x++)
         {
-            Destroy(_tiles[GetIndexOnBoardTiles(x, y)].gameObject);
-            _tiles[GetIndexOnBoardTiles(x, y)] = null;
+            Destroy(Tiles[GetIndexOnBoardTiles(x, y)].gameObject);
+            Tiles[GetIndexOnBoardTiles(x, y)] = null;
         }
     }
 
     private void RowDown(int i)
     {
-        for (int y = i; y < TopLimit; y++)
+        for (int y = i; y < Constants.TopLimit; y++)
         {
-            for (int x = LeftLimit; x < RightLimit - LeftLimit; x++)
+            for (int x = Constants.LeftLimit; x < Constants.RightLimit - Constants.LeftLimit; x++)
             {
-                if(_tiles[GetIndexOnBoardTiles(x, y)])
+                if(Tiles[GetIndexOnBoardTiles(x, y)])
                 {
-                    _tiles[GetIndexOnBoardTiles(x, y - 1)] = _tiles[GetIndexOnBoardTiles(x, y)];
-                    _tiles[GetIndexOnBoardTiles(x, y)] = null;
-                    _tiles[GetIndexOnBoardTiles(x, y - 1)].position += Vector3.down;
+                    Tiles[GetIndexOnBoardTiles(x, y - 1)] = Tiles[GetIndexOnBoardTiles(x, y)];
+                    Tiles[GetIndexOnBoardTiles(x, y)] = null;
+                    Tiles[GetIndexOnBoardTiles(x, y - 1)].position += Vector3.down;
                 }
             }
         }
@@ -234,14 +91,14 @@ public class Board : MonoBehaviour
         {
             if (child.gameObject.CompareTag("CenterPoint"))
                 continue;
-            if(child.position.x < LeftLimit || child.position.x > RightLimit || child.position.y <= BottomLimit)
+            if(child.position.x < Constants.LeftLimit || child.position.x > Constants.RightLimit || child.position.y <= Constants.BottomLimit)
             {
                 return false;
             }
 
             int xIndex = (int)child.position.x;
             int yIndex = (int)child.position.y;
-            if(_tiles[GetIndexOnBoardTiles(xIndex, yIndex)]) 
+            if(Tiles[GetIndexOnBoardTiles(xIndex, yIndex)]) 
                 return false;
         }
         return true;
@@ -249,6 +106,6 @@ public class Board : MonoBehaviour
 
     private static int GetIndexOnBoardTiles(int column, int row)
     {
-        return row * (RightLimit - LeftLimit) + column;
+        return row * (Constants.RightLimit - Constants.LeftLimit) + column;
     }
 }

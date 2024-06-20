@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -12,10 +11,10 @@ public class Spawner : MonoBehaviour
 
     private const int TotalBlocks = 7;
     
-    private List<GameObject> _nextBlocks = new List<GameObject>();
+    private readonly List<GameObject> _nextBlocks = new();
     private GameObject _holdBlock;
     private Shadow _shadow;
-    private int[] _spawnCounter = new int[TotalBlocks];
+    private readonly int[] _spawnCounter = new int[TotalBlocks];
     private int _remainBlockInCycle;
 
     
@@ -37,7 +36,7 @@ public class Spawner : MonoBehaviour
         
         Block firstBlock = Instantiate(blocks[firstRandomIndex], transform.position, Quaternion.identity).GetComponent<Block>();
         firstBlock.SetBoard(board);
-        _shadow.SetFollowBlock(firstBlock);
+        _shadow.SetFollowBlock(firstBlock, transform.position);
         
         // Spawn block in next area
         while(_nextBlocks.Count < 5)
@@ -80,7 +79,7 @@ public class Spawner : MonoBehaviour
             if(board.ValidMovement(nextBlock)){
                 nextBlock.enabled = true;
                 nextBlock.SetBoard(board);
-                _shadow.SetFollowBlock(nextBlock);
+                _shadow.SetFollowBlock(nextBlock, transform.position);
             } else {
                 _nextBlocks[0].transform.localPosition = oldPosition;
                 GameManager.Instance.GameOver();

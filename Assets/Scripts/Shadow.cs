@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using UnityEngine;
 
@@ -10,84 +9,98 @@ public class Shadow : MonoBehaviour
     
     private Block _followBlock;
     private Transform _rotationPoint;
+    private Vector3 _spawnerPosition;
 
-    public void SetFollowBlock(Block block)
+    public void SetFollowBlock(Block block, Vector3 spawnerPosition)
     {
+        _spawnerPosition = spawnerPosition;
+        ToOriginal();
         Copy(block);
     }
     
-    private void Update()
+    private void LateUpdate()
     {
-        Move();
+        if (GameManager.Instance.currentState == GameState.Move)
+            Move();
     }
 
-    public void Copy(Block block)
+    private void Copy(Block block)
     {
-        ToOriginal();
         _followBlock = block;
+        transform.position = block.transform.position;
+        _rotationPoint = block.GetRotationPoint();
         foreach (Transform child in block.gameObject.transform)
         {
-            if(!child.gameObject.CompareTag("CenterPoint"))
-                Instantiate(tilePrefab, child.transform.position, Quaternion.identity, transform);
+            if (!child.gameObject.CompareTag("CenterPoint"))
+            {
+                var shadowTile = Instantiate(tilePrefab, child.transform.position, Quaternion.identity, transform);
+                if (_rotationPoint.position == child.position)
+                    _rotationPoint = shadowTile.transform;
+            }
         }
 
-        _rotationPoint = block.GetRotationPoint();
         StartCoroutine(SmashCoroutine());
-
     }
 
-    public void ToOriginal()
+    private void ToOriginal()
     {
+        transform.position = Vector3.zero;
         foreach (Transform child in transform)
         {
             Destroy(child.gameObject);
+
         }
+    }
+
+    public void RePosition()
+    {
+        transform.position = _followBlock.transform.position;
+        StartCoroutine(SmashCoroutine());
     }
     
     private void Move()
     {
-        bool hasMove = false;
         if(Input.GetKeyDown(KeyCode.LeftArrow))
         {
-            hasMove = true;
             transform.position += Vector3.left;
+            transform.position = new Vector3(transform.position.x, _spawnerPosition.y, transform.position.z);
             if(!ValidMovement()) transform.position += Vector3.right;
+            // StartCoroutine(SmashCoroutine());
         } else if (Input.GetKeyDown(KeyCode.RightArrow))
         {
-            hasMove = true;
             transform.position += Vector3.right;
+            transform.position = new Vector3(transform.position.x, _spawnerPosition.y, transform.position.z);
             if(!ValidMovement()) transform.position += Vector3.left;
+            // StartCoroutine(SmashCoroutine());
         }
 
         if(Input.GetKeyDown(KeyCode.UpArrow))
         {
-            hasMove = true;
-            transform.position += Vector3.up * 2;
+            transform.position = new Vector3(transform.position.x, _spawnerPosition.y, transform.position.z);
             transform.RotateAround(_rotationPoint.position, new Vector3(0, 0, 1), -90);
-            if(!ValidMovement())
+            if (!ValidMovement())
+            {
                 transform.RotateAround(_rotationPoint.position, new Vector3(0, 0, 1), 90);
-
+            }
+            // StartCoroutine(SmashCoroutine());
         }
+        Smash();
 
-        if (hasMove)
-        {
-            Copy(_followBlock);
-        }
     }
 
     private IEnumerator SmashCoroutine()
     {
-        // GameManager.Instance.currentState = GameState.Wait;
+        GameManager.Instance.currentState = GameState.Wait;
         while(ValidMovement())
         {
             transform.position += Vector3.down;
         }
         transform.position += Vector3.up;
         yield return new WaitForSeconds(0.1f);
-        // GameManager.Instance.currentState = GameState.Move;
+        GameManager.Instance.currentState = GameState.Move;
     }
-    
-    public bool ValidMovement()
+
+    private bool ValidMovement()
     {
         foreach (Transform child in transform)
         {
@@ -100,8 +113,10 @@ public class Shadow : MonoBehaviour
 
             int xIndex = (int)child.position.x;
             int yIndex = (int)child.position.y;
-            if(board._tiles[GetIndexOnBoardTiles(xIndex, yIndex)]) 
+            if (board.Tiles[GetIndexOnBoardTiles(xIndex, yIndex)])
+            {
                 return false;
+            }
         }
         return true;
     }
@@ -109,5 +124,14 @@ public class Shadow : MonoBehaviour
     private static int GetIndexOnBoardTiles(int column, int row)
     {
         return row * (Constants.RightLimit - Constants.LeftLimit) + column;
+    }
+
+    private void Smash()
+    {
+        while(ValidMovement())
+        {
+            transform.position += Vector3.down;
+        }
+        transform.position += Vector3.up;
     }
 }
