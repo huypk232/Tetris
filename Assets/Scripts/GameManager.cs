@@ -38,7 +38,7 @@ public class GameManager : MonoBehaviour
         var spawnerGo = FindObjectOfType<Spawner>();
         if(spawnerGo.TryGetComponent<Spawner>(out var spawner))
         {
-            spawner.enabled = false;
+            // spawner.enabled = false;
         }
         gameOverCanvas.SetActive(true);
 

@@ -1,269 +1,207 @@
 using System.Collections;
 using UnityEngine;
-
-public enum BlockType {
-    I = 0,
-    J = 1,
-    L = 2,
-    O = 3,
-    S = 4,
-    T = 5,
-    Z = 6,
-}
+using UnityEngine.EventSystems;
+using UnityEngine.UIElements;
 
 public class Block : MonoBehaviour
 {
-    [SerializeField] private BlockType type;
-    [SerializeField] private Transform rotationPoint;
-    [SerializeField] private Transform centerPoint;
-    [SerializeField] private Material shadowMaterial;
-    [SerializeField] private Material tilePrefab;
+    public Board board { get; private set; }
+    public Tetromino data { get; private set; }
     
-    private const int LeftLimit = 0;
-    private const int RightLimit = 10;
-    private const int BottomLimit = 0;
-    private const int TopLimit = 23;
-    private const float FallTime = 1f;
-    private float _deltaFallTime;
+    public Vector3Int[] tilemapCellsPositions { get; private set; }
+    public Vector3Int tilemapPosition { get; private set; }
+    public int rotationIndex {
+        get; private set;
+    }
 
-    private static readonly Transform[] Board = new Transform[(RightLimit - LeftLimit) * (TopLimit - BottomLimit)]; // use 1 dimension array to optimize speed
-    private static GameObject _heldBlock;
-    private static bool _holdInTurn;
+    public float stepDelay = 1f;
+    public float lockDelay = 0.5f;
 
-    private Transform _holdArea;
-    private Transform _spawnPoint;
-    private Spawner _spawner;
-    
-    [Tooltip("Offset center to modify when rendering")]
-
-    private void Start()
+    private float stepTime;
+    private float lockTime;
+    public void Initilize(Board board, Vector3Int position, Tetromino data)
     {
-        _holdArea = GameObject.Find("/HoldArea/Hold").transform;
-        _spawnPoint = GameObject.Find("/Spawner").transform;
-        _spawner = FindObjectOfType<Spawner>();
-        _deltaFallTime = FallTime;
+        this.board = board;
+        this.tilemapPosition = position;
+        this.data = data;
+        this.rotationIndex = 0;
+        this.stepTime = Time.time + this.stepTime;
+        this.lockTime = 0f;
+        
+        
+        if (tilemapCellsPositions == null)
+        {
+            tilemapCellsPositions = new Vector3Int[data.Cells.Length];
+        }
+
+        for (int i = 0; i < data.Cells.Length; i++)
+        {
+            tilemapCellsPositions[i] = (Vector3Int)data.Cells[i]; // ??
+        }
     }
 
     private void Update()
     {
-        if (GameManager.Instance.currentState == GameState.Move)
-        {
-            Move();
-            HoldAndFall();
-            // Hold();
-        }
-    }
+        this.board.Clear(this);
 
-    // move to des and render center pos
-    public void MoveTo(Vector3 des)
-    {
-        transform.position = des;
-        transform.position += des - centerPoint.position;
-    }
+        this.lockTime += Time.deltaTime;
 
-    private void Move()
-    {
-        if(Input.GetKeyDown(KeyCode.LeftArrow))
+        if (Input.GetKeyDown(KeyCode.O))
         {
-            transform.position += Vector3.left;
-            if(!ValidMovement()) transform.position += Vector3.right;
-        } else if (Input.GetKeyDown(KeyCode.RightArrow))
-        {
-            transform.position += Vector3.right;
-            if(!ValidMovement()) transform.position += Vector3.left;
-        }
-
-        if(Input.GetKeyDown(KeyCode.UpArrow))
-        {
-            transform.RotateAround(rotationPoint.position, new Vector3(0, 0, 1), -90);
-            if(!ValidMovement()) 
-                transform.RotateAround(rotationPoint.position, new Vector3(0, 0, 1), 90);
-
-        }  
-    }
-
-    private void HoldAndFall()
-    {
-        if(Input.GetKeyDown(KeyCode.Space))
-        {
-            StartCoroutine(SmashCoroutine());
-            AddToBoard();
-            if(IsFullCols())
-            {
-                enabled = false;
-                GameManager.Instance.GameOver();
-                return;
-            }
-            enabled = false;
-            _spawner.Spawn();
-            _holdInTurn = false; // refactor
-            GameManager.Instance.currentState = GameState.Move;
-        } else if(Input.GetKeyDown(KeyCode.C)) {
-            if(!_holdInTurn)
-            {
-                StartCoroutine(HoldCoroutine());
-            }
-        } else {
-            
-            if(_deltaFallTime > 0.0f)
-            {
-                if(Input.GetKey(KeyCode.DownArrow))
-                {
-                    _deltaFallTime -= 10 * Time.deltaTime;
-                } else {
-                    _deltaFallTime -= Time.deltaTime;
-                }
-            } else {
-                transform.position += Vector3.down;
-                if(!ValidMovement()) 
-                {
-                    transform.position += Vector3.up;
-                    AddToBoard();
-                    if(IsFullCols()){
-                        enabled = false;
-                        GameManager.Instance.GameOver();
-                        return;
-                    }
-                    enabled = false;
-                    _spawner.Spawn();
-                    _holdInTurn = false; // refactor
-                }
-                _deltaFallTime = FallTime;
-            }   
+            Rotate(-1); // 
         } 
+        else if
+        (Input.GetKeyDown(KeyCode.P))
+        {
+            Rotate(1); // 
+        }
         
+        // horizon move
+        if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow))
+        {
+            ValidateMove(Vector2Int.left);
+        } 
+        else if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow))
+        {
+            ValidateMove(Vector2Int.right);
+        }
+        
+        // Soft drop
+        if (Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.DownArrow))
+        {
+            ValidateMove(Vector2Int.down);
+        }
+        
+        // Hard drop
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            HardDrop();
+        }
+
+        if (Time.time >= this.stepTime)
+        {
+            Step();
+        }
+        this.board.SetTiles(this);
     }
 
-    private IEnumerator SmashCoroutine()
+    private void Step()
     {
-        GameManager.Instance.currentState = GameState.Wait;
-        while(ValidMovement())
+        this.stepTime = Time.time + this.stepDelay;
+        ValidateMove(Vector2Int.down);
+        if (this.lockTime >= this.lockDelay)
         {
-            transform.position += Vector3.down;
+            Lock();
         }
-        transform.position += Vector3.up;
-        yield return new WaitForSeconds(0.1f);
-        GameManager.Instance.currentState = GameState.Move;
     }
     
-    private IEnumerator HoldCoroutine()
+    private void HardDrop()
     {
-        GameManager.Instance.currentState = GameState.Wait;
-        enabled = false;
-        transform.rotation = Quaternion.identity;
-        MoveTo(_holdArea.position);
-
-        if(!_heldBlock)
+        while (ValidateMove(Vector2Int.down))
         {
-            _heldBlock = transform.gameObject;
-            _spawner.Spawn();
-        } else {
-            _heldBlock.TryGetComponent(out Block tempBlock);
-            {
-                tempBlock.enabled = true;
-            }
-            _heldBlock.transform.position = _spawnPoint.position;
-            _heldBlock = transform.gameObject;
-        }
-        _holdInTurn = true;
-        yield return null;
-        GameManager.Instance.currentState = GameState.Move;
-    }
-
-    private void AddToBoard()
-    {
-        var minY = TopLimit;
-        var maxY = BottomLimit;
-        foreach (Transform child in transform)
-        {
-            if(child.gameObject.CompareTag("CenterPoint")) 
-                continue;
-            var xIndex = (int)child.position.x;
-            var yIndex = (int)child.position.y;
-            Board[GetIndexOnBoardTiles(xIndex, yIndex)] = child;
-            if (minY > yIndex) minY = yIndex;
-            if (maxY < yIndex) maxY = yIndex;
-        }
-        for(var line = maxY; line >= minY; line--)
-        {
-            if(IsFullRow(line))
-            {
-                DeleteFullRow(line);
-                RowDown(line);
-            }
+            continue;
         }
     }
 
-    private bool IsFullCols()
+    private void Lock()
     {
-        foreach(Transform child in transform)
-        {
-            if (child.gameObject.CompareTag("CenterPoint"))
-                continue;
-            int yIndex = (int)child.position.y;
+        this.board.SetTiles(this);
+        this.board.ClearLines();
+        this.board.SpawnBlock();
+    }
+    
+    
+    // validate a simulate move then move if it can
+    private bool ValidateMove(Vector2Int translation)
+    {
+        Vector3Int simulatePosition = this.tilemapPosition;
+        simulatePosition.x += translation.x;
+        simulatePosition.y += translation.y;
 
-            if(yIndex > 20)
+        bool isValid = this.board.IsValidPosition(this, simulatePosition);
+        if (isValid)
+        {   
+            this.tilemapPosition = simulatePosition;
+            this.lockTime = 0f;
+        }
+
+        return isValid;
+    }
+
+    private void Rotate(int direction)
+    {
+        int originalRotation = this.rotationIndex;
+        this.rotationIndex += Wrap(this.rotationIndex * direction, 0, 4);
+        ApplyRotationMatrix(direction);
+
+        // reverse if false
+        if (!TestWallKicks(this.rotationIndex, direction))
+        {
+            this.rotationIndex = originalRotation;
+            ApplyRotationMatrix(-direction);
+        }
+    }
+
+    private void ApplyRotationMatrix(int direction)
+    {
+        for (int i = 0; i < this.tilemapCellsPositions.Length; i++)
+        {
+            Vector3 cell = this.tilemapCellsPositions[i];
+            int x, y;
+            switch (this.data.type)
+            {
+                // base on https://en.wikipedia.org/wiki/Rotation_matrix
+                case TetrominoType.I:
+                case TetrominoType.O:
+                    cell.x -= 0.5f;
+                    cell.y -= 0.5f;
+                    x = Mathf.RoundToInt(cell.x * Data.RotationMatrix[0] * direction + (cell.y * Data.RotationMatrix[1] * direction));
+                    y = Mathf.RoundToInt(cell.x * Data.RotationMatrix[2] * direction + (cell.y * Data.RotationMatrix[3] * direction));
+                    break;
+                default:
+                    x = Mathf.RoundToInt(cell.x * Data.RotationMatrix[0] * direction + (cell.y * Data.RotationMatrix[1] * direction));
+                    y = Mathf.RoundToInt(cell.x * Data.RotationMatrix[2] * direction + (cell.y * Data.RotationMatrix[3] * direction));
+                    break;
+            }
+
+            this.tilemapCellsPositions[i] = new Vector3Int(x, y, 0);
+        }
+    }
+
+    private bool TestWallKicks(int rotationIndexFunc, int rotationDirection)
+    {
+        int wallKickIndex = GetWallKickIndex(rotationIndexFunc, rotationDirection);
+        for (int i = 0; i < this.data.WallKicks.GetLength(i); i++)
+        {
+            Vector2Int translation = this.data.WallKicks[wallKickIndex, i];
+            if (ValidateMove(translation))
+            {
                 return true;
+            }
         }
         return false;
     }
 
-    private static bool IsFullRow(int y)
+    private int GetWallKickIndex(int rotationIndex, int rotationDirection)
     {
-        for (int column = LeftLimit; column < RightLimit - LeftLimit; column++)
+        int wallKickIndex = rotationIndex * 2;
+        if (rotationDirection < 0)
         {
-            if (!Board[GetIndexOnBoardTiles(column, y)])
-                return false;
+            wallKickIndex--;
         }
-        return true;
-    }
 
-    private static void DeleteFullRow(int y)
+        return Wrap(wallKickIndex, 0, this.data.WallKicks.Length);
+    }
+    
+    private int Wrap(int input, int min, int max)
     {
-        for (int x = 0; x < RightLimit; x++)
+        if (input < min)
         {
-            Destroy(Board[GetIndexOnBoardTiles(x, y)].gameObject);
-            Board[GetIndexOnBoardTiles(x, y)] = null;
+            return max - (min - input) % (max - min);
         }
-    }
-
-    private static void RowDown(int i)
-    {
-        for (int y = i; y < TopLimit; y++)
+        else
         {
-            for (int x = LeftLimit; x < RightLimit - LeftLimit; x++)
-            {
-                if(Board[GetIndexOnBoardTiles(x, y)])
-                {
-                    Board[GetIndexOnBoardTiles(x, y - 1)] = Board[GetIndexOnBoardTiles(x, y)];
-                    Board[GetIndexOnBoardTiles(x, y)] = null;
-                    Board[GetIndexOnBoardTiles(x, y - 1)].position += Vector3.down;
-                }
-            }
+            return max + (input - min) % (max - min);
         }
-    }
-
-    public bool ValidMovement()
-    {
-        foreach (Transform child in transform)
-        {
-            if (child.gameObject.CompareTag("CenterPoint"))
-                continue;
-            if(child.position.x < LeftLimit || child.position.x > RightLimit || child.position.y <= BottomLimit)
-            {
-                return false;
-            }
-
-            int xIndex = (int)child.position.x;
-            int yIndex = (int)child.position.y;
-            if(Board[GetIndexOnBoardTiles(xIndex, yIndex)]) 
-                return false;
-        }
-        return true;
-    }
-
-    private static int GetIndexOnBoardTiles(int column, int row)
-    {
-        return row * (RightLimit - LeftLimit) + column;
     }
 }

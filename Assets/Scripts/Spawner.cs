@@ -40,8 +40,8 @@ public class Spawner : MonoBehaviour
             GameObject newBlock = Instantiate(blocks[randomIndex], nextAreas[_nextBlocks.Count].position, Quaternion.identity);
             if(newBlock.TryGetComponent(out Block block))
             {
-                block.MoveTo(nextAreas[_nextBlocks.Count].position);
-                block.enabled = false;
+                // block.MoveTo(nextAreas[_nextBlocks.Count].position);
+                // block.enabled = false;
             }
             _nextBlocks.Add(newBlock);
         }
@@ -58,56 +58,23 @@ public class Spawner : MonoBehaviour
               
     }
 
-    public void Spawn()
-    {
-        var oldPosition = _nextBlocks[0].transform.position;
-        _nextBlocks[0].transform.position = transform.position;
-        if( _nextBlocks[0].TryGetComponent(out Block nextBlock))
-        {
-            if(nextBlock.ValidMovement()){
-                nextBlock.enabled = true;
-            } else {
-                _nextBlocks[0].transform.localPosition = oldPosition;
-                GameManager.Instance.GameOver();
-                return;
-            }
-        }
-        _nextBlocks.RemoveAt(0);
-        UpdateNextBlocks();
-    }
+    // public void Spawn()
+    // {
+    //     var oldPosition = _nextBlocks[0].transform.position;
+    //     _nextBlocks[0].transform.position = transform.position;
+    //     if( _nextBlocks[0].TryGetComponent(out Block nextBlock))
+    //     {
+    //         // if(nextBlock.ValidMovement()){
+    //             nextBlock.enabled = true;
+    //         } else {
+    //             _nextBlocks[0].transform.localPosition = oldPosition;
+    //             GameManager.Instance.GameOver();
+    //             return;
+    //         }
+    //     }
+    //     // _nextBlocks.RemoveAt(0);
+    //     // UpdateNextBlocks();
+    // }
 
-    private void UpdateNextBlocks()
-    {
-        // change position block in next area
-        for (int i = 0; i < _nextBlocks.Count; i++)
-        {
-            if(_nextBlocks[i].TryGetComponent(out Block nextBlock))
-            {
-                nextBlock.MoveTo(nextAreas[i].position);
-            }
-        }
-
-        if (_remainBlockInCycle <= 0)
-            InitSpawnCounter();
-        int randomIndex;
-        do
-        {
-            randomIndex = Random.Range(0, blocks.Length);
-        } while (_spawnCounter[randomIndex] == 0);
-
-        _spawnCounter[randomIndex]--;
-        _remainBlockInCycle--;
-        
-        // spawn new block to next area
-        GameObject newBlock = Instantiate(blocks[randomIndex], nextAreas[4].position, Quaternion.identity);
-
-
-        if(newBlock.TryGetComponent(out Block block))
-        {
-            block.MoveTo(nextAreas[4].position);
-            block.enabled = false;
-        }
-        _nextBlocks.Add(newBlock);
-    }
 
 }
