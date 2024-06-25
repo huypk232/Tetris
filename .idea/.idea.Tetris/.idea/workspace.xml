@@ -4,7 +4,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b445b5d3-8126-4436-b751-86bea11f2995" name="Changes" comment="" />
+    <list default="true" id="b445b5d3-8126-4436-b751-86bea11f2995" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Tetris/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Tetris/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Block.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Block.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Board.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Board.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Shadow.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Shadow.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Spawner.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Spawner.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ProjectSettings/ProjectVersion.txt" beforeDir="false" afterPath="$PROJECT_DIR$/ProjectSettings/ProjectVersion.txt" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -63,7 +70,7 @@
 }</component>
   <component name="RunManager" selected="Attach to Unity Editor.Attach to Unity Editor">
     <configuration name="Start Unity" type="RunUnityExe" factoryName="Unity Executable">
-      <option name="EXE_PATH" value="C:\Program Files\Unity\Hub\Editor\2022.3.28f1\Editor\Unity.exe" />
+      <option name="EXE_PATH" value="$USER_HOME$/Unity/Hub/Editor/2022.3.30f1/Editor/Unity" />
       <option name="PROGRAM_PARAMETERS" value="-projectPath $PROJECT_DIR$ -debugCodeOptimization" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <option name="PASS_PARENT_ENVS" value="1" />
@@ -71,7 +78,7 @@
       <method v="2" />
     </configuration>
     <configuration name="Unit Tests (batch mode)" type="RunUnityExe" factoryName="Unity Executable">
-      <option name="EXE_PATH" value="C:\Program Files\Unity\Hub\Editor\2022.3.28f1\Editor\Unity.exe" />
+      <option name="EXE_PATH" value="$USER_HOME$/Unity/Hub/Editor/2022.3.30f1/Editor/Unity" />
       <option name="PROGRAM_PARAMETERS" value="-runTests -batchmode -projectPath $PROJECT_DIR$ -testResults Logs/results.xml -testPlatform EditMode -debugCodeOptimization" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <option name="PASS_PARENT_ENVS" value="1" />
@@ -127,6 +134,8 @@
       <workItem from="1718865493660" duration="981000" />
       <workItem from="1718866659893" duration="930000" />
       <workItem from="1718870627107" duration="376000" />
+      <workItem from="1718961015455" duration="509000" />
+      <workItem from="1719295307224" duration="529000" />
     </task>
     <task id="LOCAL-00001" summary="drafty">
       <option name="closed" value="true" />

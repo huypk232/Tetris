@@ -1,7 +1,7 @@
 using System.Collections;
 using UnityEngine;
 
-public enum BlockType {
+public enum TetrominoType {
     I = 0,
     J = 1,
     L = 2,
@@ -13,7 +13,7 @@ public enum BlockType {
 
 public class Block : MonoBehaviour
 {
-    [SerializeField] private BlockType type;
+    [SerializeField] private TetrominoType type;
     [SerializeField] private Transform rotationPoint;
     [SerializeField] private Transform centerPoint;
     
@@ -26,14 +26,14 @@ public class Block : MonoBehaviour
     private Board _board;
     private Transform _holdArea;
     private Transform _spawnPoint;
-    private Spawner _spawner;
+    // private Spawner _spawner;
     private Shadow _shadow;
 
     private void Start()
     {
         _holdArea = GameObject.Find("/HoldArea/Hold").transform;
         _spawnPoint = GameObject.Find("/Spawner").transform;
-        _spawner = FindObjectOfType<Spawner>();
+        // _spawner = FindObjectOfType<Spawner>();
         _deltaFallTime = FallTime;
         _shadow = FindObjectOfType<Shadow>();
         _shadow.Follow(this);
@@ -100,7 +100,7 @@ public class Block : MonoBehaviour
                 return;
             }
             enabled = false;
-            _spawner.Spawn();
+            _board.Spawn();
             _holdInTurn = false; // refactor
             GameManager.Instance.currentState = GameState.Move;
         } else if(Input.GetKeyDown(KeyCode.C)) {
@@ -130,7 +130,8 @@ public class Block : MonoBehaviour
                         return;
                     }
                     enabled = false;
-                    _spawner.Spawn();
+                    _board.Spawn();
+
                     _holdInTurn = false; // refactor
                 }
                 _deltaFallTime = FallTime;
@@ -161,7 +162,8 @@ public class Block : MonoBehaviour
         if(!_heldBlock)
         {
             _heldBlock = transform.gameObject;
-            _spawner.Spawn();
+            _board.Spawn();
+
         } else {
             _heldBlock.transform.position = _spawnPoint.position;
             _heldBlock.TryGetComponent(out Block tempBlock);

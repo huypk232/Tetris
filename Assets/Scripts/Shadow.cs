@@ -64,6 +64,16 @@ public class Shadow : MonoBehaviour
     
     private void Move()
     {
+        var reverseMoveStack = new Stack();
+        if(Input.GetKeyDown(KeyCode.UpArrow) && _rotationPoint)
+        {
+            transform.position = new Vector3(transform.position.x, _followBlockHeight.y, transform.position.z);
+            transform.RotateAround(_rotationPoint.position, new Vector3(0, 0, 1), -90);
+            if (!ValidMovement())
+            {
+                transform.RotateAround(_rotationPoint.position, new Vector3(0, 0, 1), 90);
+            }
+        }
         if(Input.GetKeyDown(KeyCode.LeftArrow))
         {
             transform.position += Vector3.left;
@@ -75,18 +85,7 @@ public class Shadow : MonoBehaviour
             transform.position = new Vector3(transform.position.x, _followBlockHeight.y, transform.position.z);
             if(!ValidMovement()) transform.position += Vector3.left;
         }
-
-        if(Input.GetKeyDown(KeyCode.UpArrow) && _rotationPoint)
-        {
-            transform.position = new Vector3(transform.position.x, _followBlockHeight.y, transform.position.z);
-            transform.RotateAround(_rotationPoint.position, new Vector3(0, 0, 1), -90);
-            if (!ValidMovement())
-            {
-                transform.RotateAround(_rotationPoint.position, new Vector3(0, 0, 1), 90);
-            }
-        }
         Smash();
-        // StartCoroutine(SmashCoroutine());
     }
 
     private IEnumerator SmashCoroutine()
